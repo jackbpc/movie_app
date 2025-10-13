@@ -38,9 +38,6 @@
 
                 <!-- Movie Metadata Footer -->
                 <div class="bg-gray-800/70 p-6 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center text-white font-semibold gap-4">
-                    <span>
-                        <strong>Genre:</strong> {{ $movie->genre ?? 'Unknown' }}
-                    </span>
                     <span class="text-yellow-400">
                         ⭐ {{ $movie->rating ?? 'N/A' }}/5
                     </span>

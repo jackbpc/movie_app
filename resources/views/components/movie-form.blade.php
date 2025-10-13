@@ -64,7 +64,7 @@
             >
         </div>
 
-        {{-- Image upload --}}
+        {{-- Poster Upload --}}
         <div>
             <label for="image" class="block mb-1 text-white font-semibold">Poster Image</label>
             <input
@@ -75,35 +75,36 @@
                        file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
             >
 
-            {{-- Show current poster preview if editing --}}
+            {{-- Only show preview if editing and image exists --}}
             @if(isset($movie) && $movie->image)
-                <div class="mt-4">
+                <div x-data="{ open: false }" class="mt-4">
                     <p class="text-white font-semibold mb-2">Current Poster (click to enlarge):</p>
-                    <img 
-                        src="{{ asset('images/' . $movie->image) }}" 
-                        alt="{{ $movie->title }}" 
+                    <img
+                        src="{{ asset('images/' . $movie->image) }}"
+                        alt="{{ $movie->title }}"
                         class="w-40 rounded-lg shadow-md border border-white/20 cursor-pointer transition-transform duration-300 hover:scale-105"
-                        onclick="document.getElementById('posterModal').classList.remove('hidden')"
+                        @click="open = true"
                     >
-                </div>
 
-                {{-- Modal for large preview --}}
-                <div 
-                    id="posterModal" 
-                    class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden"
-                    onclick="document.getElementById('posterModal').classList.add('hidden')"
-                >
-                    <img 
-                        src="{{ asset('images/' . $movie->image) }}" 
-                        alt="{{ $movie->title }}" 
-                        class="max-h-[90%] max-w-[90%] rounded-lg shadow-xl transform transition-transform duration-500 hover:scale-110"
-                        onclick="event.stopPropagation()"
+                    {{-- Modal / Lightbox --}}
+                    <div
+                        x-show="open"
+                        x-transition
+                        class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                        @click="open = false"
                     >
+                        <img
+                            src="{{ asset('images/' . $movie->image) }}"
+                            alt="{{ $movie->title }}"
+                            class="max-h-[90%] max-w-[90%] rounded-lg shadow-xl transform transition-transform duration-500 hover:scale-110"
+                            @click.stop
+                        >
+                    </div>
                 </div>
             @endif
         </div>
 
-        {{-- Buttons (Update/Create on left, Cancel on right) --}}
+        {{-- Buttons --}}
         <div class="flex items-center justify-between mt-6">
             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
                 {{ $method === 'PUT' ? 'Update Movie' : 'Create Movie' }}
@@ -115,3 +116,6 @@
         </div>
     </div>
 </form>
+
+{{-- Alpine.js for modal functionality --}}
+<script src="//unpkg.com/alpinejs" defer></script>
