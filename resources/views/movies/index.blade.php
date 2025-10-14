@@ -20,7 +20,8 @@
 
                 <!-- Movie Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch">
-                    @foreach($movies as $movie)
+                    {{-- By replacing foreach loop with forelse loop, we can show a message when no results are found from the user's search query. --}}
+                    @forelse($movies as $movie)
                         <div 
                             class="group relative flex flex-col bg-gray-900/80 border border-gray-700 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer"
                             onclick="window.location='{{ route('movies.show', $movie) }}'"
@@ -89,7 +90,11 @@
                             <!-- Lighter overlay on hover (pointer-events fix) -->
                             <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"></div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col-span-full text-center text-gray-300 py-20 text-lg font-semibold">
+                            No movies found :(
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>

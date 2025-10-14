@@ -14,25 +14,27 @@ class MovieController extends Controller
     {
         $query = Movie::query();
 
-        // Search by title
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
-        }
-
         // Filter by genre
         if ($request->filled('genre')) {
             $query->where('genre', $request->genre);
         }
 
-        // Toggleable A-Z sort
-        if ($request->has('sort_az') && $request->sort_az == '1') {
-            $query->orderBy('title', 'asc');
-        } else {
-            $query->orderBy('created_at', 'desc'); // default sort
+        // Search by title
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Get results
-        $movies = $query->get();
+        // Sorting
+        if ($request->filled('sort')) {
+            $direction = $request->sort === 'desc' ? 'desc' : 'asc';
+            $query->orderBy('title', $direction);
+        } else {
+            // Default sort by created_at descending
+            $query->orderBy('created_at', 'desc');
+        }
+
+        // Get results with pagination (optional)
+        $movies = $query->paginate(10)->appends($request->query());
 
         // Get all genres for the dropdown in navbar
         $genres = Movie::select('genre')->distinct()->pluck('genre');
