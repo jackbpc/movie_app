@@ -62,7 +62,7 @@
                                     {{-- Display rating out of 5 --}}
                                     @if(is_numeric($movie->rating))
                                         <span class="text-yellow-400 font-semibold">
-                                            ⭐ {{ $movie->rating }}/5
+                                            ⭐ {{ $movie->rating }}/5.0
                                         </span>
                                     @endif
 
