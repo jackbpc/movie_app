@@ -10,16 +10,17 @@ class MovieController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+        public function index(Request $request)
     {
+        // Start query builder
         $query = Movie::query();
 
-        // Filter by genre
+        // Filter by genre if provided
         if ($request->filled('genre')) {
             $query->where('genre', $request->genre);
         }
 
-        // Search by title
+        // Search by title if provided
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
@@ -33,14 +34,19 @@ class MovieController extends Controller
             $query->orderBy('created_at', 'desc');
         }
 
-        // Get results with pagination (optional)
-        $movies = $query->paginate(10)->appends($request->query());
+        // Fetch all movies
+        $movies = $query->get(); 
 
-        // Get all genres for the dropdown in navbar
+
+        // Fetch all distinct genres for the dropdown
         $genres = Movie::select('genre')->distinct()->pluck('genre');
+
+        // Debug: ensure movies are being retrieved
+        // dd($movies);
 
         return view('movies.index', compact('movies', 'genres'));
     }
+
 
     /**
      * Show the form for creating a new resource.
