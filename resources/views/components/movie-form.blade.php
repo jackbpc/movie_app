@@ -5,6 +5,16 @@
     'class' => ''
 ])
 
+@php
+    // Reusable input classes with !important to override global CSS
+    $inputClasses = "
+        w-full p-3 rounded-lg
+        !bg-gray-800 !border !border-gray-700
+        text-white placeholder-gray-400
+        focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-blue-500
+    ";
+@endphp
+
 <form action="{{ $action }}" method="POST" enctype="multipart/form-data" class="{{ $class }}">
     @csrf
     @if($method === 'PUT' || $method === 'PATCH')
@@ -21,7 +31,7 @@
                 id="title"
                 value="{{ old('title', $movie->title ?? '') }}"
                 placeholder="Title goes here..."
-                class="w-full p-3 rounded-lg bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="{{ $inputClasses }}"
             >
         </div>
 
@@ -33,7 +43,7 @@
                 id="description"
                 rows="4"
                 placeholder="Enter the movie description..."
-                class="w-full p-3 rounded-lg bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="{{ $inputClasses }}"
             >{{ old('description', $movie->description ?? '') }}</textarea>
         </div>
 
@@ -45,8 +55,8 @@
                 name="genre"
                 id="genre"
                 value="{{ old('genre', $movie->genre ?? '') }}"
-                placeholder="e.g. Comedy, Drama, Action..."
-                class="w-full p-3 rounded-lg bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="e.g. Comedy, Drama..."
+                class="{{ $inputClasses }}"
             >
         </div>
 
@@ -59,8 +69,8 @@
                 name="rating"
                 id="rating"
                 value="{{ old('rating', $movie->rating ?? '') }}"
-                placeholder="Enter a rating between 0 and 5"
-                class="w-full p-3 rounded-lg bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="0–5"
+                class="{{ $inputClasses }}"
             >
         </div>
 
@@ -71,28 +81,20 @@
                 type="file"
                 name="image"
                 id="image"
-                class="w-full text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 
-                       file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
+                class="w-full p-2 text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-700 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600"
             >
 
-            {{-- Only show preview if editing and image exists --}}
             @if(isset($movie) && $movie->image)
                 <div x-data="{ open: false }" class="mt-4">
-                    <p class="text-white font-semibold mb-2">Current Poster (click to enlarge):</p>
+                    <p class="text-gray-200 font-semibold mb-2">Current Poster:</p>
                     <img
                         src="{{ asset('images/' . $movie->image) }}"
                         alt="{{ $movie->title }}"
-                        class="w-40 rounded-lg shadow-md border border-white/20 cursor-pointer transition-transform duration-300 hover:scale-105"
+                        class="w-40 rounded-lg shadow-md border border-gray-700 cursor-pointer transition-transform duration-300 hover:scale-105"
                         @click="open = true"
                     >
 
-                    {{-- Modal / Lightbox --}}
-                    <div
-                        x-show="open"
-                        x-transition
-                        class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-                        @click="open = false"
-                    >
+                    <div x-show="open" x-transition class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" @click="open = false">
                         <img
                             src="{{ asset('images/' . $movie->image) }}"
                             alt="{{ $movie->title }}"
@@ -106,7 +108,7 @@
 
         {{-- Buttons --}}
         <div class="flex items-center justify-between mt-6">
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
                 {{ $method === 'PUT' ? 'Update Movie' : 'Create Movie' }}
             </button>
 
@@ -117,5 +119,4 @@
     </div>
 </form>
 
-{{-- Alpine.js for modal functionality --}}
 <script src="//unpkg.com/alpinejs" defer></script>
