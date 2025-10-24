@@ -19,9 +19,7 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-{
-    // Share all distinct genres with all views
-    $genres = Movie::select('genre')->distinct()->pluck('genre');
-    View::share('genres', $genres);
-}
+    {
+    
+    }
 }
