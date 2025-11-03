@@ -3,9 +3,9 @@
   {
     -webkit-appearance:none; -moz-appearance:none; appearance:none;
     background:transparent; border:none!important; outline:none!important;
-    color:#fff; /* Selected text white */
+    color:#fff;
   }
-  select.custom-select option { color:#000; } /* Dropdown options black */
+  select.custom-select option { color:#000; }
   select.custom-select::-ms-expand{display:none;}
   select.custom-select:focus, input[type="text"]:focus{box-shadow:none!important;}
   .glass-nav{background:rgba(46,17,77,.85);backdrop-filter:blur(20px);
@@ -31,7 +31,11 @@
       <div class="hidden md:flex space-x-8">
         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="nav-link-modern text-white/90 hover:text-white font-medium text-sm">{{ __('Dashboard') }}</x-nav-link>
         <x-nav-link :href="route('movies.index')" :active="request()->routeIs('movies.index')" class="nav-link-modern text-white/90 hover:text-white font-medium text-sm">{{ __('All Movies') }}</x-nav-link>
-        <x-nav-link :href="route('movies.create')" :active="request()->routeIs('movies.create')" class="nav-link-modern text-white/90 hover:text-white font-medium text-sm">{{ __('Create Movie') }}</x-nav-link>
+        
+        {{-- Only show Create Movie link to admins --}}
+        @if(Auth::check() && Auth::user()->role === 'admin')
+          <x-nav-link :href="route('movies.create')" :active="request()->routeIs('movies.create')" class="nav-link-modern text-white/90 hover:text-white font-medium text-sm">{{ __('Create Movie') }}</x-nav-link>
+        @endif
       </div>
     </div>
 
@@ -80,11 +84,16 @@
       </svg>
     </button>
 
+    {{-- Mobile Menu --}}
     <div :class="{'block':open,'hidden':!open}" class="hidden md:hidden border-t border-white/10">
       <div class="px-4 pt-4 pb-6 space-y-3 bg-black/20 backdrop-blur-lg">
         <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg">{{ __('Dashboard') }}</x-responsive-nav-link>
         <x-responsive-nav-link :href="route('movies.index')" :active="request()->routeIs('movies.index')" class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg">{{ __('All Movies') }}</x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('movies.create')" :active="request()->routeIs('movies.create')" class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg">{{ __('Create Movie') }}</x-responsive-nav-link>
+        
+        {{-- Only show Create Movie link to admins (mobile) --}}
+        @if(Auth::check() && Auth::user()->role === 'admin')
+          <x-responsive-nav-link :href="route('movies.create')" :active="request()->routeIs('movies.create')" class="text-white/90 hover:text-white hover:bg-white/10 rounded-lg">{{ __('Create Movie') }}</x-responsive-nav-link>
+        @endif
 
         @if(Auth::check())
         <div class="pt-3 border-t border-white/10 text-gray-200 flex items-center justify-between">
