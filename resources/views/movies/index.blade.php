@@ -1,5 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <h2 class="text-3xl font-bold text-white tracking-wide drop-shadow-sm">
             {{ __('Movies List') }}
         </h2>

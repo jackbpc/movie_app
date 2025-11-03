@@ -1,24 +1,25 @@
 <style>
-select.custom-select, input[type="text"] {
-  -webkit-appearance:none; -moz-appearance:none; appearance:none;
-  background:transparent; border:none!important; outline:none!important;
-  color:#fff; /* Selected text white */
-}
-select.custom-select option { color:#000; } /* Dropdown options black */
-select.custom-select::-ms-expand{display:none;}
-select.custom-select:focus, input[type="text"]:focus{box-shadow:none!important;}
-.glass-nav{background:rgba(46,17,77,.85);backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.37);}
-.nav-link-modern{position:relative;transition:.3s;}
-.nav-link-modern::after{content:'';position:absolute;bottom:-4px;left:50%;width:0;height:2px;
-  background:linear-gradient(90deg,#a78bfa,#ec4899);transform:translateX(-50%);transition:width .3s;}
-.nav-link-modern:hover::after,.nav-link-modern.active::after{width:100%;}
-.filter-card{background:rgba(17,24,39,.6);backdrop-filter:blur(10px);border:none!important;transition:.3s;box-shadow:none;}
-.filter-card:hover{box-shadow:0 4px 16px rgba(168,85,247,.2);}
-.btn-modern{position:relative;background:linear-gradient(135deg,#667eea,#764ba2);border:1px solid rgba(255,255,255,.15);transition:.3s;overflow:hidden;}
-.btn-modern::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#764ba2,#667eea);opacity:0;transition:.3s;}
-.btn-modern:hover::before{opacity:1;}
-.btn-modern span{position:relative;z-index:1;}
+  select.custom-select, input[type="text"] 
+  {
+    -webkit-appearance:none; -moz-appearance:none; appearance:none;
+    background:transparent; border:none!important; outline:none!important;
+    color:#fff; /* Selected text white */
+  }
+  select.custom-select option { color:#000; } /* Dropdown options black */
+  select.custom-select::-ms-expand{display:none;}
+  select.custom-select:focus, input[type="text"]:focus{box-shadow:none!important;}
+  .glass-nav{background:rgba(46,17,77,.85);backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.37);}
+  .nav-link-modern{position:relative;transition:.3s;}
+  .nav-link-modern::after{content:'';position:absolute;bottom:-4px;left:50%;width:0;height:2px;
+    background:linear-gradient(90deg,#a78bfa,#ec4899);transform:translateX(-50%);transition:width .3s;}
+  .nav-link-modern:hover::after,.nav-link-modern.active::after{width:100%;}
+  .filter-card{background:rgba(17,24,39,.6);backdrop-filter:blur(10px);border:none!important;transition:.3s;box-shadow:none;}
+  .filter-card:hover{box-shadow:0 4px 16px rgba(168,85,247,.2);}
+  .btn-modern{position:relative;background:linear-gradient(135deg,#667eea,#764ba2);border:1px solid rgba(255,255,255,.15);transition:.3s;overflow:hidden;}
+  .btn-modern::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#764ba2,#667eea);opacity:0;transition:.3s;}
+  .btn-modern:hover::before{opacity:1;}
+  .btn-modern span{position:relative;z-index:1;}
 </style>
 
 <nav x-data="{ open:false }" class="glass-nav sticky top-0 z-50">
@@ -91,7 +92,7 @@ select.custom-select:focus, input[type="text"]:focus{box-shadow:none!important;}
           <form method="POST" action="{{ route('logout') }}">@csrf
             <button type="submit" class="text-sm text-gray-300 hover:text-purple-400">{{ __('Log Out') }}</button>
           </form>
-        </div>P
+        </div>
         @endif
       </div>
     </div>

@@ -39,7 +39,7 @@
 
     <!-- Footer -->
     <footer class="text-center text-sm text-purple-200 mt-8 mb-4">
-        © {{ date('Y') }} <span class="font-semibold text-white">CineVault</span>. All rights reserved.
+        © {{ date('Y') }} <span class="font-semibold text-white">MyMovieApp</span>. All rights reserved.
     </footer>
 </body>
 </html>
