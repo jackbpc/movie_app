@@ -10,12 +10,14 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 
-    <!-- Scripts -->
+    <!-- Tailwind + Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="font-sans antialiased text-gray-100 bg-gradient-to-br from-[#2E114D] via-[#4B1D75] to-[#6E3CA5] min-h-screen">
+
     <!-- Navigation -->
     @include('layouts.navigation')
 
@@ -31,15 +33,25 @@
     @endisset
 
     <!-- Main content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div class="bg-white/10 backdrop-blur-md shadow-xl rounded-3xl p-8 ring-1 ring-white/10">
+    <main class="py-10">
+        {{-- Optional container — skip it when $noContainer is set --}}
+        @if (!isset($noContainer) || !$noContainer)
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white/10 backdrop-blur-md shadow-xl rounded-3xl p-8 ring-1 ring-white/10">
+                    {{ $slot }}
+                </div>
+            </div>
+        @else
             {{ $slot }}
-        </div>
+        @endif
     </main>
 
     <!-- Footer -->
     <footer class="text-center text-sm text-purple-200 mt-8 mb-4">
         © {{ date('Y') }} <span class="font-semibold text-white">MyMovieApp</span>. All rights reserved.
     </footer>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html>

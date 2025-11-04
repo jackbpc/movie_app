@@ -20,7 +20,7 @@
                 @endif
 
                 <!-- Movie Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 items-stretch">
                     @forelse($movies as $movie)
                         <div 
                             class="group relative flex flex-col bg-gray-900/80 border border-gray-700 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer"
@@ -40,31 +40,39 @@
                             </div>
 
                             <!-- Content -->
-                            <div class="flex flex-col flex-grow p-5 min-h-[240px]">
-                                <h3 class="text-xl font-bold text-white truncate mb-2">
+                            <div class="flex flex-col flex-grow p-5 min-h-[260px]">
+                                <h3 class="text-2xl font-bold text-white truncate mb-3">
                                     {{ $movie->title }}
                                 </h3>
 
                                 {{-- Genres --}}
-                                <div class="flex flex-wrap gap-2 mb-3">
+                                <div class="flex flex-wrap gap-2 mb-4">
                                     @foreach(explode(',', $movie->genre) as $genre)
-                                        <span class="bg-purple-600/70 text-white text-xs font-medium px-2 py-0.5 rounded-full">
+                                        <span class="bg-purple-600/70 text-white text-sm font-medium px-3 py-1 rounded-full">
                                             {{ trim($genre) }}
                                         </span>
                                     @endforeach
                                 </div>
 
-                                <p class="text-sm text-gray-300 mb-4 line-clamp-4">
+                                {{-- Description --}}
+                                <p class="text-base text-gray-300 mb-4 line-clamp-4">
                                     {{ $movie->description }}
                                 </p>
 
                                 <div class="mt-auto flex justify-between items-center">
-                                    {{-- Display rating out of 5 --}}
-                                    @if(is_numeric($movie->rating))
-                                        <span class="text-yellow-400 font-semibold">
-                                            ⭐ {{ $movie->rating }}/5.0
-                                        </span>
-                                    @endif
+                                    {{-- Display star rating --}}
+                                    @php
+                                        $avg = $movie->ratings->count() ? round($movie->ratings->avg('rating')) : 0;
+                                    @endphp
+                                    <div class="flex items-center gap-1">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= $avg)
+                                                <span class="text-yellow-400 text-xl">★</span>
+                                            @else
+                                                <span class="text-gray-500 text-xl">★</span>
+                                            @endif
+                                        @endfor
+                                    </div>
 
                                     {{-- Edit/Delete buttons for admins only --}}
                                     @if(Auth::check() && Auth::user()->role === 'admin')

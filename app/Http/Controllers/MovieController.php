@@ -15,30 +15,31 @@ class MovieController extends Controller
     {
         $query = Movie::query();
 
-        // Filter by genre if provided
+        // Filtering by genre
         if ($request->filled('genre')) {
             $query->where('genre', $request->genre);
         }
 
-        // Search by title if provided
+        // Search
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
         // Sorting
         if ($request->filled('sort')) {
-            $direction = $request->sort === 'desc' ? 'desc' : 'asc';
-            $query->orderBy('title', $direction);
-        } else {
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('title', $request->sort);
         }
 
         $movies = $query->get();
 
+        // Get all unique genres for the navbar
         $genres = Movie::select('genre')->distinct()->pluck('genre');
 
         return view('movies.index', compact('movies', 'genres'));
     }
+
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -59,40 +60,53 @@ class MovieController extends Controller
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'required|string|max:1000',
             'genre' => 'required|string|max:100',
             'rating' => 'required|numeric|min:0|max:5',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Handle image upload
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
             $data['image'] = $imageName;
         }
 
+        // Create the movie
         Movie::create($data);
 
         return redirect()->route('movies.index')
-                         ->with('success', 'Movie created successfully!');
+            ->with('success', 'Movie created successfully!');
     }
+
+
 
     /**
      * Display the specified resource.
      */
+    // app/Http/Controllers/MovieController.php
     public function show(Movie $movie)
     {
+        // Eager-load ratings (latest first)
+        $movie->load(['ratings' => function ($query) {
+            $query->latest();
+        }]);
+
         return view('movies.show', compact('movie'));
     }
+
+
+
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Movie $movie)
     {
-        if ($response = $this->adminOnly()) return $response;
+        if ($response = $this->adminOnly()) return $response; // Check admin access
 
-        return view('movies.edit', compact('movie'));
+        return view('movies.edit', compact('movie')); // Pass movie to the edit view
     }
 
     /**
@@ -123,7 +137,7 @@ class MovieController extends Controller
         $movie->update($data);
 
         return redirect()->route('movies.index')
-                         ->with('success', 'Movie updated successfully!');
+            ->with('success', 'Movie updated successfully!');
     }
 
     /**
@@ -140,7 +154,7 @@ class MovieController extends Controller
         $movie->delete();
 
         return redirect()->route('movies.index')
-                         ->with('success', 'Movie deleted successfully.');
+            ->with('success', 'Movie deleted successfully.');
     }
 
     /**
@@ -150,10 +164,8 @@ class MovieController extends Controller
     {
         if (!Auth::check() || Auth::user()->role !== 'admin') {
             return redirect()->route('movies.index')
-                            ->with('error', 'You must be an admin to access this page.');
+                ->with('error', 'You must be an admin to access this page.');
         }
         return null;
     }
-
-
 }
