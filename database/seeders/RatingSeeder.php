@@ -26,7 +26,8 @@ class RatingSeeder extends Seeder
 
         foreach ($movies as $movie) {
             // Decide how many unique users will rate this movie (1–5, but not more than total users)
-            $numRatings = rand(1, min(5, $users->count()));
+            $numRatings = rand(3, min(5, $users->count()));
+            
 
             // Pick that many distinct users
             $randomUsers = $users->random($numRatings);
