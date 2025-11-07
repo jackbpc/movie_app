@@ -16,8 +16,9 @@ class Movie extends Model
      */
     public function ratings()
     {
-        return $this->hasMany(Rating::class);
+        return $this->hasMany(\App\Models\Rating::class);
     }
+
 
     public function getAverageRatingAttribute()
     {

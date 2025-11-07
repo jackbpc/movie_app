@@ -18,11 +18,11 @@ class Rating extends Model
 
     public function movie()
     {
-        return $this->belongsTo(Movie::class);
+        return $this->belongsTo(\App\Models\Movie::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Models\User::class);
     }
 }

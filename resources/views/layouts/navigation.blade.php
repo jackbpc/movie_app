@@ -46,7 +46,7 @@
                     </div>
 
                     {{-- Submit --}}
-                    <button type="submit" class="btn-modern text-white h-[42px] text-sm font-medium"><span>Apply</span></button>
+                    <button type="submit" class="btn-modern text-white h-[42px] text-sm font-medium"><span>Search</span></button>
                 </form>
             </div>
         @endif
