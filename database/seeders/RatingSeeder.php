@@ -14,16 +14,6 @@ class RatingSeeder extends Seeder
         $movies = Movie::all();
         $users = User::all();
 
-        if ($movies->isEmpty()) {
-            $this->command->warn('⚠️ No movies found. Run MovieSeeder first.');
-            return;
-        }
-
-        if ($users->isEmpty()) {
-            $this->command->warn('⚠️ No users found. Run UserSeeder first.');
-            return;
-        }
-
         foreach ($movies as $movie) {
             // Decide how many unique users will rate this movie (1–5, but not more than total users)
             $numRatings = rand(3, min(5, $users->count()));
@@ -46,7 +36,5 @@ class RatingSeeder extends Seeder
                 }
             }
         }
-
-        $this->command->info('✅ Ratings seeded successfully!');
     }
 }

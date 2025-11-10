@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\Admin\RatingController as AdminRatingController;
 
 // Homepage
 Route::get('/', function () {
@@ -33,7 +34,38 @@ Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->middlewar
 
 // Rating Routes — only for submitting a rating for a movie
 Route::post('/movies/{movie}/ratings', [RatingController::class, 'store'])
-    ->middleware('auth') // only authenticated users can submit
+    ->middleware('auth')
     ->name('ratings.store');
+
+// ----------------------------
+// User Rating Routes (for normal users)
+// ----------------------------
+Route::middleware('auth')->group(function () {
+    // Edit your own rating
+    Route::get('/ratings/{rating}/edit', [RatingController::class, 'edit'])->name('ratings.edit');
+    Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+    Route::delete('/ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
+});
+
+// ----------------------------
+// Admin Ratings Routes
+// ----------------------------
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // View all ratings for a specific movie
+    Route::get('/movies/{movie}/ratings', [AdminRatingController::class, 'index'])
+        ->name('ratings.index');
+
+    // Edit a specific rating (admin)
+    Route::get('/ratings/{rating}/edit', [AdminRatingController::class, 'edit'])
+        ->name('ratings.edit');
+
+    // Update a rating (admin)
+    Route::put('/ratings/{rating}', [AdminRatingController::class, 'update'])
+        ->name('ratings.update');
+
+    // Delete a rating (admin)
+    Route::delete('/ratings/{rating}', [AdminRatingController::class, 'destroy'])
+        ->name('ratings.destroy');
+});
 
 require __DIR__.'/auth.php';

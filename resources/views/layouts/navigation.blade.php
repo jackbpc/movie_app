@@ -3,26 +3,30 @@
 <nav x-data="{ open: false }" class="glass-nav sticky top-0">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
 
-        {{-- Logo --}}
-        <a href="{{ route('movies.index') }}" class="transform hover:scale-105 transition">
-            <x-application-logo class="h-10 w-auto fill-white drop-shadow-lg" />
-        </a>
+        {{-- Left Section: Logo + Navigation Links --}}
+        <div class="flex items-center space-x-10">
+            {{-- Logo --}}
+            <a href="{{ route('movies.index') }}" class="transform hover:scale-105 transition">
+                <x-application-logo class="h-10 w-auto fill-white drop-shadow-lg" />
+            </a>
 
-        {{-- Desktop Links --}}
-        <div class="hidden md:flex items-center space-x-8">
-            <x-nav-link :href="route('movies.index')" :active="request()->routeIs('movies.index')"
-                class="nav-link-modern">{{ __('All Movies') }}</x-nav-link>
+            {{-- Desktop Links --}}
+            <div class="hidden md:flex items-center space-x-6">
+                <x-nav-link :href="route('movies.index')" :active="request()->routeIs('movies.index')"
+                    class="nav-link-modern">{{ __('All Movies') }}</x-nav-link>
 
-            @if(Auth::check() && Auth::user()->role === 'admin')
-                <x-nav-link :href="route('movies.create')" :active="request()->routeIs('movies.create')"
-                    class="nav-link-modern">{{ __('Create Movie') }}</x-nav-link>
-            @endif
+                @if(Auth::check() && Auth::user()->role === 'admin')
+                    <x-nav-link :href="route('movies.create')" :active="request()->routeIs('movies.create')"
+                        class="nav-link-modern">{{ __('Create Movie') }}</x-nav-link>
+                @endif
+            </div>
         </div>
 
-        {{-- Right Side: Search/Sort only on index --}}
-        @if(request()->routeIs('movies.index'))
-            <div class="hidden md:flex items-center space-x-3">
-                <form method="GET" action="{{ route('movies.index') }}" class="flex items-center space-x-3">
+        {{-- Right Section: Search/Sort (only on index) + User Info --}}
+        <div class="flex items-center space-x-6">
+            {{-- Search/Sort --}}
+            @if(request()->routeIs('movies.index'))
+                <form method="GET" action="{{ route('movies.index') }}" class="hidden md:flex items-center space-x-3">
                     {{-- Sort --}}
                     <div class="relative filter-card h-[42px]">
                         <select name="sort" class="custom-select pl-4 pr-10 h-full text-white text-sm w-28">
@@ -37,7 +41,8 @@
 
                     {{-- Search --}}
                     <div class="relative filter-card h-[42px]">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -48,27 +53,36 @@
                     {{-- Submit --}}
                     <button type="submit" class="btn-modern text-white h-[42px] text-sm font-medium"><span>Search</span></button>
                 </form>
-            </div>
-        @endif
+            @endif
 
-        {{-- User Dropdown / Logout --}}
-        @if(Auth::check())
-            <div class="hidden md:flex items-center space-x-4">
-                <span class="text-gray-200">{{ Auth::user()->name }}</span>
-                <form method="POST" action="{{ route('logout') }}">@csrf
-                    <button type="submit" class="text-sm text-gray-300 hover:text-purple-400 transition">Log Out</button>
-                </form>
-            </div>
-        @endif
+            {{-- User Section --}}
+            @if(Auth::check())
+                <div class="hidden md:flex items-center space-x-4">
+                    <span class="text-gray-200 text-sm">{{ Auth::user()->name }}</span>
 
-        {{-- Mobile Menu Toggle --}}
-        <button @click="open=!open" class="md:hidden p-2 text-white hover:bg-white/10 rounded-xl">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path :class="{ 'hidden': open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                <path :class="{ 'hidden': !open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
+                    {{-- Profile Button --}}
+                    <a href="{{ route('profile.edit') }}" class="text-sm text-gray-300 hover:text-purple-400 transition">
+                        Profile
+                    </a>
 
+                    {{-- Logout --}}
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-sm text-gray-300 hover:text-purple-400 transition">Log Out</button>
+                    </form>
+                </div>
+            @endif
+
+            {{-- Mobile Menu Toggle --}}
+            <button @click="open=!open" class="md:hidden p-2 text-white hover:bg-white/10 rounded-xl">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path :class="{ 'hidden': open }" class="inline-flex" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    <path :class="{ 'hidden': !open }" class="hidden" stroke-linecap="round"
+                          stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
     </div>
 
     {{-- Mobile Menu --}}
@@ -81,10 +95,18 @@
             @endif
 
             @if(Auth::check())
-                <div class="pt-3 border-t border-white/10 text-gray-200 flex items-center justify-between">
-                    <span>{{ Auth::user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}">@csrf
-                        <button type="submit" class="text-sm text-gray-300 hover:text-purple-400">Log Out</button>
+                <div class="pt-3 border-t border-white/10 text-gray-200 space-y-2">
+                    <span class="block">{{ Auth::user()->name }}</span>
+
+                    {{-- Profile Link --}}
+                    <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')">
+                        Profile
+                    </x-responsive-nav-link>
+
+                    {{-- Logout --}}
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-sm text-gray-300 hover:text-purple-400 w-full text-left">Log Out</button>
                     </form>
                 </div>
             @endif

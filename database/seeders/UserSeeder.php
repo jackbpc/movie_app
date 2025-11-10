@@ -18,7 +18,15 @@ class UserSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // Create 9 random users (using the factory)
-        User::factory(9)->create();
+        // Create a demo regular user
+        User::create([
+            'name' => 'Test User',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user', // or 'editor', 'viewer', etc.
+        ]);
+
+        // Create 8 random users to make 10 test numbers
+        User::factory(8)->create();
     }
 }

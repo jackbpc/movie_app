@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Rating;
 use App\Models\Movie;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class RatingController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of all ratings (optional).
      */
@@ -22,19 +25,16 @@ class RatingController extends Controller
      */
     public function store(Request $request, Movie $movie)
     {
-        // Check if the user already rated this movie
         $existing = $movie->ratings()->where('user_id', auth()->id())->first();
         if ($existing) {
             return redirect()->back()->with('error', 'You have already submitted a rating for this movie.');
         }
 
-        // Validate input
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:200',
         ]);
 
-        // Create new rating
         $movie->ratings()->create([
             'rating' => $request->rating,
             'comment' => $request->comment,
@@ -43,7 +43,6 @@ class RatingController extends Controller
 
         return redirect()->back()->with('success', 'Rating submitted successfully!');
     }
-
 
     /**
      * Display a specific rating (optional).
@@ -63,7 +62,7 @@ class RatingController extends Controller
     }
 
     /**
-     * Update a rating.
+     * Update a rating and redirect back to the movie show page.
      */
     public function update(Request $request, Rating $rating)
     {
@@ -79,11 +78,13 @@ class RatingController extends Controller
             'comment' => $request->comment,
         ]);
 
-        return redirect()->back()->with('success', 'Rating updated!');
+        // Redirect back to the movie show page
+        return redirect()->route('movies.show', $rating->movie->id)
+                         ->with('success', 'Rating updated successfully!');
     }
 
     /**
-     * Remove a rating.
+     * Delete a rating.
      */
     public function destroy(Rating $rating)
     {

@@ -1,7 +1,19 @@
 <x-app-layout>
 
-<div class="py-12 bg-gradient-to-b from-gray-900 to-black min-h-screen">
+<div class="py-12 flex justify-center items-start min-h-screen">
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+
+        <!-- Success / Error Alerts -->
+        @if(session('success'))
+            <div id="alert-success" class="bg-green-600 text-white p-3 rounded mb-6 transition-all duration-700 transform translate-y-[-20px] opacity-0">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div id="alert-error" class="bg-red-600 text-white p-3 rounded mb-6 transition-all duration-700 transform translate-y-[-20px] opacity-0">
+                {{ session('error') }}
+            </div>
+        @endif
 
         <!-- Movie Card -->
         <div class="bg-gray-900/90 rounded-3xl shadow-2xl border border-gray-700 overflow-hidden space-y-8">
@@ -84,7 +96,6 @@
                                 <p class="text-red-500 text-sm">{{ $message }}</p>
                             @enderror
 
-                            <!-- Submit button at bottom, floating left -->
                             <div class="mt-4 flex justify-start">
                                 <button type="submit" 
                                         class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-lg transition-all shadow-lg">
@@ -97,19 +108,56 @@
 
                 <!-- Recent Ratings -->
                 @if($movie->ratings && $movie->ratings->count())
-                    <div class="flex-1 space-y-3 max-h-60 overflow-y-auto">
-                        <h4 class="text-white font-semibold text-lg">Recent Ratings</h4>
-                        @foreach($movie->ratings->take(3) as $rating)
-                            <div class="bg-gray-900/50 p-3 rounded-lg text-gray-200 flex flex-col gap-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-yellow-400 font-semibold">⭐ {{ $rating->rating }}/5</span>
-                                    @if($rating->comment)
-                                        <span class="italic text-gray-300">- {{ $rating->comment }}</span>
-                                    @endif
+                    <div class="flex-1 space-y-3">
+                        <h4 class="text-white font-semibold text-lg mb-2">Recent Ratings</h4>
+
+                        <div class="max-h-60 overflow-y-auto space-y-3">
+                            @foreach($movie->ratings->take(3) as $rating)
+                                <div class="bg-gray-900/50 p-3 rounded-lg text-gray-200 flex flex-col gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-yellow-400 font-semibold">⭐ {{ $rating->rating }}/5</span>
+                                        @if($rating->comment)
+                                            <span class="italic text-gray-300">- {{ $rating->comment }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-gray-400">{{ $rating->created_at->diffForHumans() }}</div>
                                 </div>
-                                <div class="text-xs text-gray-400">{{ $rating->created_at->diffForHumans() }}</div>
+                            @endforeach
+                        </div>
+
+                        <!-- User/Admin Action Buttons – OUTSIDE scrollable area -->
+                        @auth
+                            @php
+                                $user = auth()->user();
+                                $userRating = $movie->ratings->where('user_id', $user->id)->first();
+                                $isAdmin = isset($user->is_admin) && $user->is_admin;
+                            @endphp
+
+                            <div class="mt-4 flex gap-2">
+                                @if($isAdmin)
+                                    <a href="{{ route('ratings.index', $movie->id) }}" 
+                                       class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all">
+                                       Manage All Ratings
+                                    </a>
+                                @else
+                                    <a href="{{ $userRating ? route('ratings.edit', $userRating->id) : '#' }}" 
+                                       onclick="return checkUserRating(this);"
+                                       class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all">
+                                       Edit Your Review
+                                    </a>
+
+                                    <form action="{{ $userRating ? route('ratings.destroy', $userRating->id) : '#' }}" method="POST" 
+                                          onsubmit="return checkUserRating(this, true);">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all">
+                                            Delete Your Review
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
-                        @endforeach
+                        @endauth
                     </div>
                 @endif
 
@@ -119,10 +167,12 @@
     </div>
 </div>
 
-<!-- JS for alert popup -->
+<!-- JS Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const userHasRated = @json($userHasRated); // Pass PHP variable to JS
+    const userHasRated = @json($userHasRated);
+
+    // Block rating form if already rated
     if(userHasRated) {
         const form = document.getElementById('rating-form');
         form.addEventListener('submit', function(e) {
@@ -130,7 +180,46 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('You have already submitted a rating for this movie.');
         });
     }
+
+    // Animate success/error alerts
+    function animateAlert(alertId) {
+        const alert = document.getElementById(alertId);
+        if(alert) {
+            // Slide in
+            alert.style.opacity = 1;
+            alert.style.transform = 'translateY(0)';
+            // Slide out after 5s
+            setTimeout(() => {
+                alert.style.opacity = 0;
+                alert.style.transform = 'translateY(-20px)';
+                setTimeout(() => alert.remove(), 700);
+            }, 5000);
+        }
+    }
+
+    animateAlert('alert-success');
+    animateAlert('alert-error');
 });
+
+// Confirm deletion
+function confirmDeleteUserReview() {
+    return confirm('Are you sure you want to delete your review? This action cannot be undone.');
+}
+
+// Check if user has a rating before editing/deleting
+function checkUserRating(element, isForm = false) {
+    const userHasRated = @json($userHasRated);
+    if (!userHasRated) {
+        alert('You need to submit a rating before you can edit or delete it.');
+        return false;
+    }
+
+    if(isForm) {
+        return confirmDeleteUserReview();
+    }
+
+    return true;
+}
 </script>
 
 </x-app-layout>

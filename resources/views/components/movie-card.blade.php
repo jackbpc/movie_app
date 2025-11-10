@@ -1,4 +1,4 @@
-<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col sm:flex-row h-full">
+<div class="bg-white rounded-xl shadow-md overflow-hidden">
 
     <!-- Movie image -->
     <div class="w-full sm:w-1/3 h-64 flex items-center justify-center border-b sm:border-b-0 sm:border-r border-gray-300 flex-shrink-0">
