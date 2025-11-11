@@ -8,9 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Movie extends Model
 {
     use HasFactory;
-
-    // Existing properties...
-
     /**
      * Get the ratings for the movie.
      */
@@ -19,10 +16,13 @@ class Movie extends Model
         return $this->hasMany(\App\Models\Rating::class);
     }
 
-    public function genres()
+    // app/Models/Movie.php
+        public function genres()
     {
-        return $this->belongsToMany(Genre::class);
+        return $this->belongsToMany(\App\Models\Genre::class, 'genre_movie', 'movie_id', 'genre_id');
     }
+
+
 
     public function getAverageRatingAttribute()
     {

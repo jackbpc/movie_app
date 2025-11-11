@@ -12,44 +12,34 @@ class RatingController extends Controller
     use AuthorizesRequests;
 
     /**
-     * Display a listing of all ratings (optional).
-     */
-    public function index()
-    {
-        $ratings = Rating::with('movie', 'user')->latest()->get();
-        return view('ratings.index', compact('ratings'));
-    }
-
-    /**
      * Store a newly created rating for a specific movie.
      */
     public function store(Request $request, Movie $movie)
     {
-        $existing = $movie->ratings()->where('user_id', auth()->id())->first();
+        $user = $request->user();
+
+        // Prevent multiple ratings by the same user
+        $existing = $movie->ratings()->where('user_id', $user->id)->first();
         if ($existing) {
             return redirect()->back()->with('error', 'You have already submitted a rating for this movie.');
         }
 
+
+
+        // Validate input
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:200',
         ]);
 
+        // Create rating
         $movie->ratings()->create([
             'rating' => $request->rating,
             'comment' => $request->comment,
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
         ]);
 
         return redirect()->back()->with('success', 'Rating submitted successfully!');
-    }
-
-    /**
-     * Display a specific rating (optional).
-     */
-    public function show(Rating $rating)
-    {
-        return view('ratings.show', compact('rating'));
     }
 
     /**
@@ -78,7 +68,6 @@ class RatingController extends Controller
             'comment' => $request->comment,
         ]);
 
-        // Redirect back to the movie show page
         return redirect()->route('movies.show', $rating->movie->id)
                          ->with('success', 'Rating updated successfully!');
     }
@@ -92,5 +81,14 @@ class RatingController extends Controller
         $rating->delete();
 
         return redirect()->back()->with('success', 'Rating deleted!');
+    }
+
+    /**
+     * Display all ratings (admin only).
+     */
+    public function index()
+    {
+        $ratings = Rating::with('movie', 'user')->latest()->get();
+        return view('ratings.index', compact('ratings'));
     }
 }

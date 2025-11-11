@@ -47,5 +47,6 @@ class GenreSeeder extends Seeder
                 'updated_at' => $timestamp
             ],
         ]);
+
     }
 }

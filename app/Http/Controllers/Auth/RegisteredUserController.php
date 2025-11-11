@@ -40,13 +40,13 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => strtolower(trim($request->role)), // ✅ Force lowercase and remove spaces
+            'role' => strtolower(trim($request->role)), 
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('/movies', absolute: false));
+        return redirect(route('/index', absolute: false));
     }
 }

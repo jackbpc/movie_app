@@ -1,51 +1,50 @@
 <x-app-layout>
     <x-slot name="header">
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <h2 class="text-3xl font-bold text-white tracking-wide drop-shadow-sm">
             {{ __('Movies List') }}
         </h2>
     </x-slot>
 
-    <div class="max-w-7xl space-y-8">
+    <div class="max-w-7xl space-y-8 px-4 md:px-0">
 
-        {{-- Success Message --}}
+        {{-- Success / Error Messages --}}
         @if(session('success'))
             <div class="bg-green-600/20 border border-green-400 text-green-100 px-6 py-4 rounded-lg text-center font-semibold shadow-lg backdrop-blur-sm">
                 {{ session('success') }}
             </div>
         @endif
+        @if(session('error'))
+            <div class="bg-red-600/20 border border-red-400 text-red-100 px-6 py-4 rounded-lg text-center font-semibold shadow-lg backdrop-blur-sm">
+                {{ session('error') }}
+            </div>
+        @endif
 
-        <!-- Movie Grid -->
+        {{-- Movie Grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
             @forelse($movies as $movie)
                 <div 
                     class="group relative flex flex-col bg-gray-800/70 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 h-full cursor-pointer"
-                    onclick="window.location='{{ route('movies.show', $movie) }}'"
-                >
-                    <!-- Poster -->
+                    onclick="window.location='{{ route('movies.show', $movie) }}'">
+                    
+                    {{-- Poster --}}
                     <div class="aspect-[2/3] overflow-hidden rounded-t-2xl">
-                        @if ($movie->image)
-                            <img src="{{ asset('images/' . $movie->image) }}" 
-                                 alt="{{ $movie->title }}" 
-                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-t-2xl">
-                        @else
-                            <img src="{{ asset('images/placeholder.jpg') }}" 
-                                 alt="No image" 
-                                 class="w-full h-full object-cover opacity-70 rounded-t-2xl">
-                        @endif
+                        <img src="{{ $movie->image ? asset('images/' . $movie->image) : asset('images/placeholder.jpg') }}" 
+                             alt="{{ $movie->title }}" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-t-2xl">
                     </div>
 
-                    <!-- Content -->
+                    {{-- Content --}}
                     <div class="flex flex-col flex-grow p-4 md:p-5 min-h-[260px]">
+                        {{-- Title --}}
                         <h3 class="text-xl md:text-2xl font-bold text-white truncate mb-2">
                             {{ $movie->title }}
                         </h3>
 
                         {{-- Genres --}}
                         <div class="flex flex-wrap gap-2 mb-2 md:mb-3">
-                            @foreach(explode(',', $movie->genre) as $genre)
+                            @foreach($movie->genres as $genre)
                                 <span class="bg-purple-600/70 text-white text-xs md:text-sm font-medium px-2.5 py-0.5 rounded-full">
-                                    {{ trim($genre) }}
+                                    {{ $genre->name }}
                                 </span>
                             @endforeach
                         </div>
@@ -55,6 +54,7 @@
                             {{ $movie->short_description }}
                         </p>
 
+                        {{-- Rating & Admin Controls --}}
                         <div class="mt-auto flex justify-between items-center">
                             {{-- Star rating --}}
                             @php
@@ -93,7 +93,7 @@
                         </div>
                     </div>
 
-                    <!-- Lighter overlay on hover -->
+                    {{-- Hover overlay --}}
                     <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"></div>
                 </div>
             @empty

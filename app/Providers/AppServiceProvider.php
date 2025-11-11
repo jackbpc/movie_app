@@ -2,29 +2,33 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use App\Models\Rating;
-use App\Policies\RatingPolicy;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\Models\Genre;
 
-class AuthServiceProvider extends ServiceProvider
+class AppServiceProvider extends ServiceProvider
 {
     /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
+     * Register any application services.
      */
-    protected $policies = [
-        Rating::class => RatingPolicy::class,
-    ];
+    public function register(): void
+    {
+        //
+    }
 
     /**
-     * Register any authentication / authorization services.
+     * Bootstrap any application services.
      */
     public function boot(): void
     {
-        $this->registerPolicies();
+        // Share unique genres with all views for navigation
+        View::composer('*', function ($view) {
+            $genres = Genre::orderBy('name')
+                ->pluck('name')
+                ->unique()   // remove duplicates
+                ->values();  // reindex collection
 
-        //
+            $view->with('navGenres', $genres);
+        });
     }
 }
