@@ -16,10 +16,12 @@ class MovieController extends Controller
     {
         $query = Movie::query()->with(['genres', 'ratings']); // eager load genres & ratings
 
-        // Filter by genre
+        // Filter by genre (support both name and ID)
         if ($request->filled('genre')) {
             $query->whereHas('genres', function ($q) use ($request) {
-                $q->where('id', $request->genre); // now filtering by genre ID
+                // Try match by name first, otherwise assume it's an ID
+                $q->where('genres.name', $request->genre)
+                  ->orWhere('genres.id', $request->genre);
             });
         }
 
@@ -28,15 +30,15 @@ class MovieController extends Controller
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Sort
+        // Sort alphabetically
         if ($request->filled('sort')) {
             $query->orderBy('title', $request->sort);
         }
 
         $movies = $query->get();
 
-        // Genres for navbar / forms
-        $navGenres = Genre::orderBy('name')->get();
+        // Get all genres for navbar display
+        $navGenres = Genre::orderBy('name')->pluck('name');
 
         return view('movies.index', compact('movies', 'navGenres'));
     }
@@ -158,7 +160,7 @@ class MovieController extends Controller
     }
 
     /**
-     * Check admin access.
+     * Restrict access to admins.
      */
     private function adminOnly()
     {

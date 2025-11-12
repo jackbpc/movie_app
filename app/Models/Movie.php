@@ -17,10 +17,11 @@ class Movie extends Model
     }
 
     // app/Models/Movie.php
-        public function genres()
+    public function genres()
     {
-        return $this->belongsToMany(\App\Models\Genre::class, 'genre_movie', 'movie_id', 'genre_id');
+        return $this->belongsToMany(Genre::class);
     }
+
 
 
 
