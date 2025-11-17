@@ -1,6 +1,7 @@
 /* ===== Global Inputs & Selects ===== */
+
 select.custom-select,
-input[type="text"] {
+#navbar input[type="text"] {
     appearance: none;
     background: transparent;
     border: none;

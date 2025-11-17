@@ -28,11 +28,13 @@ Route::middleware('auth')->group(function () {
 // Movie Routes (CRUD)
 // ----------------------------
 Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
-Route::get('/movies/{movie}', [MovieController::class, 'show'])->name('movies.show');
 
 Route::middleware('auth')->group(function () {
+    // Create movie
     Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
     Route::post('/movies', [MovieController::class, 'store'])->name('movies.store');
+
+    // Edit movie
     Route::get('/movies/{movie}/edit', [MovieController::class, 'edit'])->name('movies.edit');
     Route::put('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
     Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
@@ -45,6 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
     Route::delete('/ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
 });
+
+// Show movie route - must be **after** create/edit routes
+Route::get('/movies/{movie}', [MovieController::class, 'show'])
+    ->where('movie', '[0-9]+')
+    ->name('movies.show');
 
 // ----------------------------
 // Admin Routes

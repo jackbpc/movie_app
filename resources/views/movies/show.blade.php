@@ -15,7 +15,7 @@
 
     <!-- Movie Hero Section -->
     <div class="md:flex md:gap-8 items-start">
-        
+
         <!-- Poster -->
         @if($movie->image)
             <img src="{{ asset('images/' . $movie->image) }}" 
@@ -25,7 +25,7 @@
 
         <!-- Movie Info -->
         <div class="mt-6 md:mt-0 flex-1 flex flex-col justify-start space-y-4">
-            
+
             <!-- Title & Genres -->
             <div>
                 <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">{{ $movie->title }}</h1>
@@ -51,6 +51,27 @@
                 <span class="text-white text-sm md:text-base font-medium">Average Rating</span>
             </div>
 
+            {{-- Admin Movie Management Buttons --}}
+            @auth
+                @if(auth()->user()->role === 'admin')
+                    <div class="flex gap-3 mt-4">
+                        <a href="{{ route('movies.edit', $movie->id) }}" 
+                           class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
+                            Edit Movie
+                        </a>
+
+                        <form action="{{ route('movies.destroy', $movie->id) }}" method="POST" 
+                              onsubmit="return confirm('Are you sure you want to delete this movie? This cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
+                                Delete Movie
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            @endauth
+
         </div>
     </div>
 
@@ -71,7 +92,6 @@
                 @if(!$userHasRated)
                     <form action="{{ route('ratings.store', $movie) }}" method="POST" class="space-y-4">
                         @csrf
-
                         <div>
                             <label class="block text-white text-sm md:text-base font-medium mb-1">Rating</label>
                             <select name="rating" required
@@ -129,30 +149,41 @@
                         </div>
 
                         @auth
-                            @if(auth()->id() === $rating->user_id || auth()->user()->role === 'admin')
+                            @if(auth()->id() === $rating->user_id)
                                 <div class="flex flex-col gap-1 ml-3">
-                                    @if(auth()->user()->role === 'admin')
-                                        <a href="{{ route('ratings.index') }}" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs text-center">Manage</a>
-                                    @else
-                                        <a href="{{ route('ratings.edit', $rating->id) }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-xs text-center">Edit</a>
+                                    <a href="{{ route('ratings.edit', $rating->id) }}" 
+                                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-xs text-center">
+                                       Edit
+                                    </a>
 
-                                        <!-- Delete Review Form -->
-                                        <form action="{{ route('ratings.destroy', $rating) }}" method="POST"
-                                              onsubmit="return confirm('Are you sure you want to delete your review? This cannot be undone.');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    @endif
+                                    <form action="{{ route('ratings.destroy', $rating) }}" method="POST"
+                                          onsubmit="return confirm('Are you sure you want to delete your review? This cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </div>
                             @endif
                         @endauth
                     </div>
                 @endforeach
             </div>
+
+            {{-- Admin Ratings Management Button --}}
+            @auth
+                @if(auth()->user()->role === 'admin')
+                    <div class="mt-4">
+                        <a href="{{ route('admin.ratings.index', ['movie' => $movie->id]) }}"
+                           class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
+                           Manage Ratings
+                        </a>
+                    </div>
+                @endif
+            @endauth
+
         </div>
     </div>
 

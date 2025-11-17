@@ -9,67 +9,58 @@ use Illuminate\Support\Facades\Auth;
 
 class MovieController extends Controller
 {
-    /**
-     * Display a listing of movies.
-     */
     public function index(Request $request)
     {
-        $query = Movie::query()->with(['genres', 'ratings']); // eager load genres & ratings
+        $query = Movie::query()->with(['genres', 'ratings']);
 
-        // Filter by genre (support both name and ID)
         if ($request->filled('genre')) {
             $query->whereHas('genres', function ($q) use ($request) {
-                // Try match by name first, otherwise assume it's an ID
                 $q->where('genres.name', $request->genre)
                   ->orWhere('genres.id', $request->genre);
             });
         }
 
-        // Search by title
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // Sort alphabetically
         if ($request->filled('sort')) {
             $query->orderBy('title', $request->sort);
         }
 
         $movies = $query->get();
-
-        // Get all genres for navbar display
         $navGenres = Genre::orderBy('name')->pluck('name');
 
         return view('movies.index', compact('movies', 'navGenres'));
     }
 
-    /**
-     * Show form to create a new movie.
-     */
     public function create()
     {
-        if ($response = $this->adminOnly()) return $response;
+        // Robust admin check
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to access this page.');
+        }
 
         $genres = Genre::orderBy('name')->get();
         return view('movies.create', compact('genres'));
     }
 
-    /**
-     * Store a newly created movie.
-     */
     public function store(Request $request)
     {
-        if ($response = $this->adminOnly()) return $response;
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to create a movie.');
+        }
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:1000',
-            'genre' => 'required|array', // array of genre IDs
+            'genre' => 'required|exists:genres,id',
             'rating' => 'required|numeric|min:0|max:5',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
@@ -77,17 +68,12 @@ class MovieController extends Controller
         }
 
         $movie = Movie::create($data);
-
-        // Attach genres
         $movie->genres()->attach($data['genre']);
 
         return redirect()->route('movies.index')
             ->with('success', 'Movie created successfully!');
     }
 
-    /**
-     * Display a specific movie.
-     */
     public function show(Movie $movie)
     {
         $movie->load(['ratings' => function ($q) {
@@ -97,33 +83,32 @@ class MovieController extends Controller
         return view('movies.show', compact('movie'));
     }
 
-    /**
-     * Show form to edit a movie.
-     */
     public function edit(Movie $movie)
     {
-        if ($response = $this->adminOnly()) return $response;
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to edit this movie.');
+        }
 
         $genres = Genre::orderBy('name')->get();
         return view('movies.edit', compact('movie', 'genres'));
     }
 
-    /**
-     * Update a movie.
-     */
     public function update(Request $request, Movie $movie)
     {
-        if ($response = $this->adminOnly()) return $response;
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to update this movie.');
+        }
 
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'genre' => 'required|array', // array of genre IDs
+            'genre' => 'required|array',
             'rating' => 'required|numeric|min:0|max:5',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             if ($movie->image && file_exists(public_path('images/' . $movie->image))) {
                 unlink(public_path('images/' . $movie->image));
@@ -134,20 +119,18 @@ class MovieController extends Controller
         }
 
         $movie->update($data);
-
-        // Sync genres
         $movie->genres()->sync($data['genre']);
 
         return redirect()->route('movies.index')
             ->with('success', 'Movie updated successfully!');
     }
 
-    /**
-     * Delete a movie.
-     */
     public function destroy(Movie $movie)
     {
-        if ($response = $this->adminOnly()) return $response;
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to delete this movie.');
+        }
 
         if ($movie->image && file_exists(public_path('images/' . $movie->image))) {
             unlink(public_path('images/' . $movie->image));
@@ -159,15 +142,11 @@ class MovieController extends Controller
             ->with('success', 'Movie deleted successfully.');
     }
 
-    /**
-     * Restrict access to admins.
-     */
-    private function adminOnly()
+    // Simplified admin check
+    private function isAdmin(): bool
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            return redirect()->route('movies.index')
-                ->with('error', 'You must be an admin to access this page.');
-        }
-        return null;
+        $user = Auth::user();
+        return $user && trim(strtolower($user->role)) === 'admin';
     }
 }
+

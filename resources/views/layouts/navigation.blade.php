@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
 
-<nav x-data="{ open: false }" class="glass-nav sticky top-0 z-50">
+<nav id="navbar" x-data="{ open: false }" class="glass-nav sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
 
         {{-- Left Section: Logo + Navigation Links --}}
@@ -29,10 +29,7 @@
             {{-- Search/Sort --}}
             @if(request()->routeIs('movies.index'))
                 <form method="GET" action="{{ route('movies.index') }}" class="hidden md:flex items-center space-x-3">
-                    {{-- Keep genre in query if selected --}}
                     <input type="hidden" name="genre" value="{{ request('genre') }}">
-
-                    {{-- Sort --}}
                     <div class="relative filter-card h-[42px]">
                         <select name="sort" class="custom-select pl-4 pr-10 h-full text-white text-sm w-28">
                             <option value="">Sort by</option>
@@ -44,7 +41,6 @@
                         </svg>
                     </div>
 
-                    {{-- Search --}}
                     <div class="relative filter-card h-[42px]">
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -53,7 +49,6 @@
                         <input type="text" name="search" placeholder="Search..." value="{{ request('search') }}" class="h-full pl-10 pr-4 text-white placeholder-gray-400 text-sm w-48"/>
                     </div>
 
-                    {{-- Submit --}}
                     <button type="submit" class="btn-modern text-white h-[42px] text-sm font-medium"><span>Search</span></button>
                 </form>
             @endif
