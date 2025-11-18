@@ -16,12 +16,17 @@
     <!-- Movie Hero Section -->
     <div class="md:flex md:gap-8 items-start">
 
+        @php
+            // Determine which image to load
+            $imagePath = !empty($movie->image)
+                ? asset('images/' . $movie->image)
+                : asset('images/placeholder.jpg');
+        @endphp
+
         <!-- Poster -->
-        @if($movie->image)
-            <img src="{{ asset('images/' . $movie->image) }}" 
-                 alt="{{ $movie->title }}" 
-                 class="w-full md:w-1/3 h-auto rounded-xl object-cover shadow-lg">
-        @endif
+        <img src="{{ $imagePath }}"
+             alt="{{ $movie->title }}"
+             class="w-full md:w-1/3 h-auto rounded-xl object-cover shadow-lg">
 
         <!-- Movie Info -->
         <div class="mt-6 md:mt-0 flex-1 flex flex-col justify-start space-y-4">
@@ -30,7 +35,7 @@
             <div>
                 <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">{{ $movie->title }}</h1>
                 <div class="flex flex-wrap gap-2">
-                    @foreach($movie->genres as $genre)
+                    @foreach($movie->genres ?? [] as $genre)
                         <span class="bg-indigo-100 text-indigo-800 text-sm md:text-base font-semibold px-3 py-1 rounded-full">
                             {{ $genre->name }}
                         </span>
@@ -51,7 +56,7 @@
                 <span class="text-white text-sm md:text-base font-medium">Average Rating</span>
             </div>
 
-            {{-- Admin Movie Management Buttons --}}
+            {{-- Admin Buttons --}}
             @auth
                 @if(auth()->user()->role === 'admin')
                     <div class="flex gap-3 mt-4">
@@ -60,11 +65,12 @@
                             Edit Movie
                         </a>
 
-                        <form action="{{ route('movies.destroy', $movie->id) }}" method="POST" 
+                        <form action="{{ route('movies.destroy', $movie->id) }}" method="POST"
                               onsubmit="return confirm('Are you sure you want to delete this movie? This cannot be undone.');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
+                            <button type="submit" 
+                                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
                                 Delete Movie
                             </button>
                         </form>
@@ -86,12 +92,13 @@
 
             @auth
                 @php
-                    $userHasRated = $movie->ratings->where('user_id', auth()->id())->count() > 0;
+                    $userHasRated = $movie->ratings->where('user_id', auth()->id())->isNotEmpty();
                 @endphp
 
                 @if(!$userHasRated)
                     <form action="{{ route('ratings.store', $movie) }}" method="POST" class="space-y-4">
                         @csrf
+
                         <div>
                             <label class="block text-white text-sm md:text-base font-medium mb-1">Rating</label>
                             <select name="rating" required
@@ -131,18 +138,21 @@
             @endguest
         </div>
 
-        <!-- Recent Reviews -->
+        <!-- Reviews Section -->
         <div class="flex-1">
             <h3 class="text-white font-bold text-lg md:text-xl mb-4">Recent Reviews</h3>
 
             <div id="ratings-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
                 @foreach($movie->ratings->sortByDesc('created_at')->take(5) as $rating)
-                    <div id="rating-{{ $rating->id }}" class="border border-gray-200 rounded-lg p-3 bg-gray-50 flex justify-between items-start">
+                    <div id="rating-{{ $rating->id }}" 
+                         class="border border-gray-200 rounded-lg p-3 bg-gray-50 flex justify-between items-start">
+
                         <div>
                             <div class="flex justify-between items-center">
                                 <span class="text-yellow-500 font-semibold">⭐ {{ $rating->rating }}/5</span>
                                 <span class="text-gray-400 text-xs md:text-sm">{{ $rating->created_at->diffForHumans() }}</span>
                             </div>
+
                             @if($rating->comment)
                                 <p class="text-gray-700 mt-1">{{ $rating->comment }}</p>
                             @endif
@@ -172,7 +182,6 @@
                 @endforeach
             </div>
 
-            {{-- Admin Ratings Management Button --}}
             @auth
                 @if(auth()->user()->role === 'admin')
                     <div class="mt-4">

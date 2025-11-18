@@ -56,20 +56,32 @@
 
                         {{-- Rating & Admin Controls --}}
                         <div class="mt-auto flex justify-between items-center">
-                            {{-- Star rating --}}
+                            
+                            {{-- Star rating logic --}}
                             @php
-                                $avg = $movie->ratings->count() ? round($movie->ratings->avg('rating')) : 0;
+                                // Calculate average rating, but also check the count
+                                $ratingCount = $movie->ratings->count();
+                                $avg = $ratingCount > 0 ? round($movie->ratings->avg('rating')) : 0;
                             @endphp
-                            <div class="flex items-center gap-1">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    @if ($i <= $avg)
-                                        <span class="text-yellow-400 text-lg md:text-xl">★</span>
-                                    @else
-                                        <span class="text-gray-500 text-lg md:text-xl">★</span>
-                                    @endif
-                                @endfor
-                            </div>
 
+                            @if ($ratingCount > 0)
+                                {{-- Display Stars (If there are ratings) --}}
+                                <div class="flex items-center gap-1">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= $avg)
+                                            <span class="text-yellow-400 text-lg md:text-xl">★</span>
+                                        @else
+                                            <span class="text-gray-500 text-lg md:text-xl">★</span>
+                                        @endif
+                                    @endfor
+                                </div>
+                            @else
+                                {{-- Display "No reviews yet" (If there are NO ratings) --}}
+                                <div class="text-gray-400 text-sm italic font-medium">
+                                    No reviews yet
+                                </div>
+                            @endif
+                            
                             {{-- Admin Edit/Delete --}}
                             @if(Auth::check() && Auth::user()->role === 'admin')
                                 <div class="flex gap-2">

@@ -32,14 +32,88 @@
                     Edit Movie:
                 </h3>
 
-                {{-- Use the unified MovieForm component --}}
-                <x-movie-form
-                    :action="route('movies.update', $movie)"
-                    :method="'PUT'"
-                    :movie="$movie"
-                    class="bg-transparent text-white"
-                />
+                <form action="{{ route('movies.update', $movie) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    @csrf
+                    @method('PUT')
+
+                    {{-- Title --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Title</label>
+                        <input type="text" name="title" value="{{ old('title', $movie->title) }}"
+                            class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                            required 
+                            placeholder="Title goes here...">
+                    </div>
+
+                    {{-- Short Description --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Short Description (for index page)</label>
+                        <textarea name="short_description" rows="4" required
+                            class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                            placeholder="A brief summary of the movie goes here...">{{ old('short_description', $movie->short_description ?? '') }}</textarea>
+                    </div>
+
+                    {{-- Long Description --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Long Description (for show page)</label>
+                        <textarea name="long_description" rows="4" required
+                            class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="The full detailed plot summary goes here...">{{ old('long_description', $movie->long_description ?? '') }}</textarea>
+                    </div>
+
+
+                    {{-- Genre Checkboxes --}}
+                    <div>
+                        <label class="block text-white font-medium mb-2">Genres</label>
+                        <div class="flex flex-wrap gap-3">
+                            @foreach($genres as $genre)
+                                <label class="inline-flex items-center space-x-2 text-white">
+                                    <input type="checkbox" name="genre[]" value="{{ $genre->id }}"
+                                        {{ (collect(old('genre', optional($movie->genres)->pluck('id') ?? []))->contains($genre->id)) ? 'checked' : '' }}
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
+                                    <span>{{ $genre->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Movie Poster with Placeholder --}}
+                    <div x-data="{
+                            preview: null,
+                            loadFile(event) {
+                                const file = event.target.files[0];
+                                if (file) {
+                                    this.preview = URL.createObjectURL(file);
+                                }
+                            }
+                        }" class="space-y-3">
+
+                        <label class="block text-white font-medium mb-1">Movie Poster (optional)</label>
+
+                        <input type="file" name="image" @change="loadFile($event)"
+                            class="w-full border-gray-300 border rounded-md p-2 bg-white text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+
+                        <div class="mt-3">
+                            <p class="text-gray-300 text-sm mb-1">Preview:</p>
+
+                            <img
+                                x-bind:src="preview ? preview : '{{ $movie->image ? asset('images/' . $movie->image) : asset('images/placeholder.jpg') }}'"
+                                alt="Movie Poster"
+                                class="w-40 h-auto rounded-lg shadow border border-gray-700 object-cover"
+                            >
+                        </div>
+                    </div>
+
+                    {{-- Submit Button --}}
+                    <div>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all">
+                            Update Movie
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </x-app-layout>
+
+<script src="//unpkg.com/alpinejs" defer></script>

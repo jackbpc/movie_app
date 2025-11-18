@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Movie extends Model
 {
     use HasFactory;
+    
+    protected $fillable = [
+        'title',
+        'short_description',
+        'long_description',
+        'rating',
+        'image',
+    ];
+
     /**
      * Get the ratings for the movie.
      */
@@ -16,18 +25,13 @@ class Movie extends Model
         return $this->hasMany(\App\Models\Rating::class);
     }
 
-    // app/Models/Movie.php
     public function genres()
     {
         return $this->belongsToMany(Genre::class);
     }
 
-
-
-
     public function getAverageRatingAttribute()
     {
         return $this->ratings()->avg('rating') ?? 0;
     }
-
 }

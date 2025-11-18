@@ -1,23 +1,22 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-3xl font-bold text-white tracking-wide drop-shadow-sm">
-            {{ __('Create New Movie') }}
+            {{ __('Create Movie') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            {{-- Success message --}}
+            {{-- Success & Error Messages --}}
             @if(session('success'))
-                <div class="bg-green-600/20 border border-green-400 text-green-100 px-6 py-4 rounded-lg mb-6 text-center font-semibold shadow-md backdrop-blur-sm">
+                <div class="bg-green-100 border border-green-400 text-green-800 px-6 py-4 rounded-lg mb-6 text-center font-semibold shadow-md">
                     {{ session('success') }}
                 </div>
             @endif
 
-            {{-- Error messages --}}
             @if ($errors->any())
-                <div class="bg-red-600/20 border border-red-400 text-red-100 px-6 py-4 rounded-lg mb-6 text-center font-semibold shadow-md backdrop-blur-sm">
+                <div class="bg-red-100 border border-red-400 text-red-800 px-6 py-4 rounded-lg mb-6 text-center font-semibold shadow-md">
                     <ul class="list-disc list-inside">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -26,68 +25,94 @@
                 </div>
             @endif
 
-            <div class="p-6 sm:rounded-3xl ring-1 ring-white/10">
-                <h3 class="font-semibold text-lg text-white mb-4">
-                    Add a New Movie:
+            {{-- Form Container --}}
+            <div class="p-6 sm:rounded-3xl ring-1 ring-gray-200 bg-gray-50">
+                <h3 class="font-semibold text-lg text-gray-900 mb-4">
+                    Add New Movie
                 </h3>
 
-                {{-- Inline Movie Form --}}
                 <form action="{{ route('movies.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
                     {{-- Title --}}
                     <div>
-                        <label class="block text-white font-medium mb-1">Title</label>
+                        <label class="block text-gray-900 font-medium mb-1">Title</label>
                         <input type="text" name="title" value="{{ old('title') }}"
-                        class="w-full border-gray-300 border rounded-md p-2  text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
-
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="Title goes here..."
+                            required
+                        >
                     </div>
 
-
-                    {{-- Description --}}
+                    {{-- Short Description --}}
                     <div>
-                        <label class="block text-white font-medium mb-1">Description</label>
-                        <textarea name="description" rows="4" required
-                                  class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none">{{ old('description') }}</textarea>
+                        <label class="block text-gray-900 font-medium mb-1">Short Description</label>
+                        <textarea name="short_description" rows="4"
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="A brief summary of the movie goes here..."
+                            required>{{ old('short_description') }}</textarea>
                     </div>
 
-                    {{-- Rating --}}
+                    {{-- Long Description --}}
                     <div>
-                        <label class="block text-white font-medium mb-1">Rating (0-5)</label>
-                        <input type="number" name="rating" value="{{ old('rating') }}" min="0" max="5" step="0.1"
-                               class="w-24 border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                        <label class="block text-gray-900 font-medium mb-1">Long Description</label>
+                        <textarea name="long_description" rows="6"
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="The full detailed plot summary goes here..."
+                            required>{{ old('long_description') }}</textarea>
                     </div>
 
-                    {{-- Genre Dropdown --}}
+                    {{-- Genres --}}
                     <div>
-                        <label class="block text-white font-medium mb-1">Genre</label>
-                        <select name="genre" required
-                                class="w-full border-gray-300 text-black border rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="">Select a Genre</option>
+                        <label class="block text-gray-900 font-medium mb-2">Genres</label>
+                        <div class="flex flex-wrap gap-3">
                             @foreach($genres as $genre)
-                                <option value="{{ $genre->id }}" {{ old('genre') == $genre->id ? 'selected' : '' }}>
-                                    {{ $genre->name }}
-                                </option>
+                                <label class="inline-flex items-center space-x-2 text-gray-900">
+                                    <input type="checkbox" name="genre[]" value="{{ $genre->id }}"
+                                        {{ collect(old('genre'))->contains($genre->id) ? 'checked' : '' }}
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 rounded">
+                                    <span>{{ $genre->name }}</span>
+                                </label>
                             @endforeach
-                        </select>
+                        </div>
                     </div>
 
-                    {{-- Image Upload --}}
-                    <div>
-                        <label class="block text-white font-medium mb-1">Movie Poster (optional)</label>
+                    {{-- Movie Poster Upload --}}
+                    <div x-data="{
+                            preview: null,
+                            loadFile(event) {
+                                const file = event.target.files[0];
+                                if(file) {
+                                    this.preview = URL.createObjectURL(file);
+                                }
+                            }
+                        }" class="space-y-3">
+                        <label class="block text-gray-900 font-medium mb-1">Movie Poster (optional)</label>
+
                         <input type="file" name="image"
-                               class="w-full border-gray-300 border rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                               @change="loadFile($event)"
+                               class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        >
+
+                        {{-- Preview --}}
+                        <div class="mt-2" x-show="preview">
+                            <p class="text-gray-700 text-sm mb-1">Preview:</p>
+                            <img :src="preview" alt="Movie Poster Preview"
+                                 class="w-40 h-auto rounded-lg shadow border border-gray-300 object-cover">
+                        </div>
                     </div>
 
                     {{-- Submit Button --}}
                     <div>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all">
+                        <button type="submit"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition-all">
                             Create Movie
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
 </x-app-layout>
+
+<script src="//unpkg.com/alpinejs" defer></script>
