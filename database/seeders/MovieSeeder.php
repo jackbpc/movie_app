@@ -19,127 +19,126 @@ class MovieSeeder extends Seeder
             Genre::firstOrCreate(['name' => $genreName]);
         }
 
-        // Movies data with intended genre names
+        // Movies data
         $movies = [
             [
                 'title' => 'The Dark Knight',
                 'short_description' => 'Batman faces the Joker in Gotham City.',
-                'long_description' => 'Batman must confront the chaotic Joker who threatens Gotham, testing his limits as a hero and forcing him to question his own moral code...',
+                'long_description' => 'Batman must confront the chaotic Joker who threatens Gotham. As the city descends into anarchy, he is forced to confront his own moral limits. The battle between order and chaos pushes everyone to the edge, testing loyalty, courage, and justice.',
                 'image' => 'thedarkknight.jpg'
             ],
             [
                 'title' => 'Inception',
                 'short_description' => 'A thief steals secrets through dreams.',
-                'long_description' => 'Dom Cobb is a skilled thief who infiltrates people’s dreams to extract information, but when tasked with planting an idea instead...',
+                'long_description' => 'Dom Cobb infiltrates people’s dreams to steal secrets. When tasked with planting an idea, he assembles a skilled team. The lines between reality and dreams blur, challenging his perception of truth and threatening his own psyche.',
                 'image' => 'inception.jpg'
-                
             ],
             [
                 'title' => 'Parasite',
                 'short_description' => 'A poor family infiltrates a wealthy household.',
-                'long_description' => 'The Kim family cunningly integrates into the wealthy Park family’s home, leading to darkly comic and tragic consequences...',
+                'long_description' => 'The Kim family cleverly integrates into the Park family’s home. Their scheme starts as harmless fun but soon spirals into dark consequences. Social tensions, jealousy, and desperation collide in a story that mixes comedy with tragedy.',
                 'image' => 'parasite.jpg'
             ],
             [
                 'title' => 'Interstellar',
                 'short_description' => 'Explorers travel through a wormhole to save humanity.',
-                'long_description' => 'A team of astronauts embarks on a journey through space and time to find a habitable planet for humanity...',
+                'long_description' => 'Astronauts journey through space and time to find a habitable planet. Facing cosmic anomalies and personal sacrifices, they must push humanity’s limits. Every choice carries profound consequences for Earth and those they love.',
                 'image' => 'interstellar.jpg'
             ],
             [
                 'title' => 'The Shawshank Redemption',
                 'short_description' => 'Two men find hope in prison.',
-                'long_description' => 'Over decades in Shawshank prison, Andy and Red forge a bond of friendship and hope...',
+                'long_description' => 'Andy and Red form a deep bond in Shawshank prison. Over decades, they endure corruption, injustice, and despair. Their story is a powerful exploration of hope, friendship, and resilience.',
                 'image' => 'theshawshankredemption.jpg'
             ],
             [
                 'title' => 'Avengers: Endgame',
                 'short_description' => 'Heroes unite to undo Thanos’ devastation.',
-                'long_description' => 'After the devastating events of Infinity War, the remaining Avengers come together to reverse the snap...',
+                'long_description' => 'After the catastrophic events of Infinity War, the Avengers regroup to undo the snap. They face challenges across time and space, making sacrifices that test their courage. The fate of the universe rests on their unity and determination.',
                 'image' => 'avengersendgame.jpg'
             ],
             [
                 'title' => 'The Matrix',
                 'short_description' => 'A hacker discovers reality is a simulation.',
-                'long_description' => 'Neo learns that the world he knows is a simulated reality controlled by machines...',
+                'long_description' => 'Neo discovers the world he knows is a simulated reality controlled by machines. Guided by Morpheus, he embraces his destiny as The One. He must challenge both human and machine forces to liberate minds.',
                 'image' => 'thematrix.jpg'
             ],
             [
                 'title' => 'Gone Girl',
                 'short_description' => 'A man becomes the prime suspect in his wife’s disappearance.',
-                'long_description' => 'When his wife goes missing, Nick faces mounting media pressure and police suspicion...',
+                'long_description' => 'Nick faces scrutiny when his wife Amy vanishes. The media frenzy intensifies, and secrets are revealed. Dark twists and manipulations turn the investigation into a suspenseful and twisted narrative.',
                 'image' => 'gonegirl.jpg'
             ],
             [
                 'title' => 'Arrival',
                 'short_description' => 'A linguist communicates with aliens.',
-                'long_description' => 'When mysterious spacecraft appear on Earth, linguist Louise Banks works tirelessly to decode their language...',
+                'long_description' => 'When mysterious spacecraft appear, linguist Louise Banks deciphers their language. The process reveals profound insights about time, memory, and choice. Humanity’s future may depend on understanding these enigmatic visitors.',
                 'image' => 'arrival.jpg'
             ],
             [
                 'title' => 'Forrest Gump',
                 'short_description' => 'A man witnesses historical events.',
-                'long_description' => 'From childhood hardships to extraordinary moments in history, Forrest Gump’s innocent perspective and perseverance shape his remarkable journey...',
+                'long_description' => 'Forrest Gump experiences major historical moments with innocence and wonder. From childhood struggles to love, loss, and heroism, his journey is filled with extraordinary events. His perspective demonstrates how life is unpredictable yet meaningful.',
                 'image' => 'forrestgump.jpg'
             ],
             [
                 'title' => 'Mad Max: Fury Road',
                 'short_description' => 'A woman rebels in a post-apocalyptic desert.',
-                'long_description' => 'In a post-apocalyptic desert, Furiosa joins Max to rebel against a tyrannical warlord...',
+                'long_description' => 'In a barren desert, Furiosa helps Max rebel against a tyrannical warlord. They embark on a high-octane chase across wastelands. Survival, trust, and redemption drive every brutal encounter.',
                 'image' => 'madmax.jpg'
             ],
             [
                 'title' => 'John Wick',
                 'short_description' => 'An ex-hitman seeks vengeance.',
-                'long_description' => 'After gangsters kill his dog, John Wick comes out of retirement to hunt down those responsible...',
+                'long_description' => 'After gangsters kill his dog, John Wick emerges from retirement to exact revenge. His pursuit is relentless, precise, and violent. The underworld is shaken by his return, as loyalty and betrayal collide.',
                 'image' => 'johnwick.jpg'
             ],
             [
                 'title' => 'Blade Runner 2049',
                 'short_description' => 'A blade runner uncovers a dangerous secret.',
-                'long_description' => 'K, a blade runner, uncovers a long-buried secret that threatens to destabilize society...',
+                'long_description' => 'K, a blade runner, discovers a secret that could destabilize society. He embarks on a journey to uncover the truth, questioning humanity, memory, and identity. Every step takes him closer to shocking revelations.',
                 'image' => 'bladerunner.jpg'
             ],
             [
                 'title' => 'Dune',
                 'short_description' => 'A family fights for control of Arrakis.',
-                'long_description' => 'House Atreides becomes embroiled in a deadly conflict over Arrakis, the galaxy’s most valuable planet...',
+                'long_description' => 'House Atreides is caught in political intrigue over Arrakis. Amid desert battles, betrayal, and prophecy, Paul Atreides rises to challenge his fate. The planet’s survival and its people hang in the balance.',
                 'image' => 'dune.jpg'
             ],
             [
                 'title' => 'Se7en',
                 'short_description' => 'Detectives hunt a serial killer.',
-                'long_description' => 'Two detectives track a serial killer who uses the seven deadly sins as inspiration for his crimes...',
+                'long_description' => 'Detectives Somerset and Mills track a serial killer inspired by the seven deadly sins. Each crime is meticulously planned to shock and disturb. Tension, suspense, and moral dilemmas escalate toward a devastating climax.',
                 'image' => 'se7en.jpg'
             ],
             [
                 'title' => 'Shutter Island',
                 'short_description' => 'A marshal investigates a psychiatric facility.',
-                'long_description' => 'U.S. Marshal Teddy Daniels investigates the disappearance of a patient on Shutter Island...',
+                'long_description' => 'U.S. Marshal Teddy Daniels investigates a missing patient at Shutter Island. As he delves deeper, he uncovers secrets that challenge his sanity. The line between reality and delusion blurs in a tense psychological thriller.',
                 'image' => 'shutterisland.jpg'
             ],
             [
                 'title' => 'The Revenant',
                 'short_description' => 'A frontiersman fights for survival.',
-                'long_description' => 'Hugh Glass is mauled by a bear and left for dead, battling the brutal wilderness and human threats to survive...',
+                'long_description' => 'Hugh Glass is mauled by a bear and left for dead. Battling harsh wilderness and relentless enemies, he seeks revenge. Survival and determination drive him through brutal, unforgiving landscapes.',
                 'image' => 'therevenant.jpg'
             ],
             [
                 'title' => 'Jurassic Park',
                 'short_description' => 'Dinosaurs escape the theme park.',
-                'long_description' => 'Cloned dinosaurs break free from Jurassic Park’s enclosures, creating chaos...',
+                'long_description' => 'When dinosaurs break free from their enclosures, chaos erupts in Jurassic Park. Scientists and visitors must survive as nature’s power proves unpredictable. Adventure and terror collide at every turn.',
                 'image' => 'jurassicpark.jpg'
             ],
             [
                 'title' => 'The Godfather',
                 'short_description' => 'The patriarch passes control of his empire.',
-                'long_description' => 'The aging Don Vito Corleone transfers control of the family crime empire to his reluctant son Michael...',
+                'long_description' => 'Don Vito Corleone transfers leadership of his crime family to Michael. As Michael navigates loyalty, betrayal, and power, the family legacy hangs in the balance. Violence and honor intertwine in a gripping saga.',
                 'image' => 'thegodfather.jpg'
             ],
             [
                 'title' => 'Fight Club',
                 'short_description' => 'Two men form an underground fight club.',
-                'long_description' => 'An insomniac office worker and a soap maker start an underground fight club that spirals into chaos...',
+                'long_description' => 'An insomniac office worker and a soap maker create a secret fight club. The club escalates into chaos and challenges societal norms. Identity, freedom, and destruction collide in unexpected ways.',
                 'image' => 'fightclub.jpg'
             ],
         ];
@@ -161,6 +160,6 @@ class MovieSeeder extends Seeder
             }
         }
 
-        $this->command->info('All movies seeded successfully with their correct genres!');
+        $this->command->info('All movies seeded successfully with long descriptions!');
     }
 }
