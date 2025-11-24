@@ -15,6 +15,7 @@ class Movie extends Model
         'long_description',
         'rating',
         'image',
+        'trailer_url',
     ];
 
     /**

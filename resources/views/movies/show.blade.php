@@ -1,200 +1,134 @@
 <x-app-layout>
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
 
-    {{-- Error / Success Messages --}}
-    @if(session('error'))
-        <div class="bg-red-600/20 border border-red-400 text-red-100 px-6 py-4 rounded-lg text-center font-semibold shadow-lg backdrop-blur-sm">
-            {{ session('error') }}
+    <!-- Top Row: Title Left / Rating Right -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-4xl font-bold text-white">{{ $movie->title }}</h1>
+        <div class="flex gap-4 mt-1 text-gray-300">
+          <span>{{ $movie->release_year ?? 'N/A' }}</span>
+          <span>{{ $movie->age_rating ?? 'N/A' }}</span>
+          <span>{{ $movie->runtime ?? 'N/A' }}</span>
         </div>
-    @endif
-    @if(session('success'))
-        <div class="bg-green-600/20 border border-green-400 text-green-100 px-6 py-4 rounded-lg text-center font-semibold shadow-lg backdrop-blur-sm">
-            {{ session('success') }}
+      </div>
+
+      <div class="text-right">
+        <span class="text-yellow-400 text-2xl font-semibold">
+          ⭐ {{ $movie->ratings->count() ? round($movie->ratings->avg('rating'), 1) : 'N/A' }}/5
+        </span>
+        <div class="text-gray-300 text-sm">
+          {{ $movie->ratings->count() }} rating{{ $movie->ratings->count() === 1 ? '' : 's' }}
         </div>
-    @endif
+      </div>
+    </div>
 
-    <!-- Movie Hero Section -->
-    <div class="md:flex md:gap-8 items-start">
+    <!-- Poster + Trailer Row with equal height -->
+    <div class="flex gap-[4px] items-start h-[450px]">
 
-        @php
-            // Determine which image to load
-            $imagePath = !empty($movie->image)
-                ? asset('images/' . $movie->image)
-                : asset('images/placeholder.jpg');
-        @endphp
-
-        <!-- Poster -->
+      <!-- Poster (portrait, left, matches trailer height) -->
+      @php
+        $imagePath = $movie->image
+          ? asset('images/' . $movie->image)
+          : asset('images/placeholder.jpg');
+      @endphp
+      <div class="flex-shrink-0 h-full">
         <img src="{{ $imagePath }}"
              alt="{{ $movie->title }}"
-             class="w-full md:w-1/3 h-auto rounded-xl object-cover shadow-lg">
+             class="h-full w-auto object-cover rounded-lg shadow-lg">
+      </div>
 
-        <!-- Movie Info -->
-        <div class="mt-6 md:mt-0 flex-1 flex flex-col justify-start space-y-4">
+      <!-- Trailer (landscape, matches poster height) -->
+      <div class="flex-1 relative h-full">
+        @if($movie->trailer_url)
+          <iframe
+            class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg"
+            src="{{ $movie->trailer_url }}"
+            title="{{ $movie->title }} Trailer"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        @else
+          <div class="w-full h-full bg-black flex items-center justify-center text-gray-400 rounded-lg shadow-lg">
+            No trailer available.
+          </div>
+        @endif
+      </div>
 
-            <!-- Title & Genres -->
-            <div>
-                <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3">{{ $movie->title }}</h1>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($movie->genres ?? [] as $genre)
-                        <span class="bg-indigo-100 text-indigo-800 text-sm md:text-base font-semibold px-3 py-1 rounded-full">
-                            {{ $genre->name }}
-                        </span>
-                    @endforeach
+    </div>
+
+    <!-- Long Description / Overview -->
+    <div class="mt-8 text-gray-200 leading-relaxed text-base">
+      <h2 class="text-2xl font-semibold text-white mb-3">Overview</h2>
+      <p>{{ $movie->long_description ?? 'No detailed description available.' }}</p>
+    </div>
+
+    <!-- Ratings & Reviews Section -->
+    <div class="md:flex md:gap-10 space-y-8 md:space-y-0 mt-12">
+
+      <!-- Submit Rating / Review -->
+      <div class="md:w-1/2 bg-gray-900 p-6 rounded-lg shadow-md border border-gray-800">
+        <h3 class="text-xl font-semibold text-white mb-4">Add Your Review</h3>
+        @auth
+          @php $userHasRated = $movie->ratings->where('user_id', auth()->id())->isNotEmpty(); @endphp
+          @if(!$userHasRated)
+            <form action="{{ route('ratings.store', $movie) }}" method="POST" class="space-y-4">
+              @csrf
+              <div>
+                <label class="block text-gray-200 mb-1">Rating</label>
+                <select name="rating" required class="w-20 p-2 rounded border border-gray-700 text-black">
+                  <option value="">–</option>
+                  @for($i = 1; $i <= 5; $i++)
+                    <option value="{{ $i }}">{{ $i }}</option>
+                  @endfor
+                </select>
+                @error('rating')
+                  <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+              </div>
+
+              <div>
+                <label class="block text-gray-200 mb-1">Review (optional)</label>
+                <textarea name="comment" rows="3" class="w-full p-2 rounded border border-gray-700 text-black" placeholder="Write your review"></textarea>
+                @error('comment')
+                  <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+              </div>
+
+              <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded">
+                Submit
+              </button>
+            </form>
+          @else
+            <p class="text-gray-400">You have already submitted a review.</p>
+          @endif
+        @else
+          <p class="text-gray-400">Please <a href="{{ route('login') }}" class="underline">login</a> to leave a review.</p>
+        @endauth
+      </div>
+
+      <!-- Reviews List -->
+      <div class="md:w-1/2 bg-gray-900/70 p-6 rounded-lg shadow-md border border-gray-800">
+        <h3 class="text-xl font-semibold text-white mb-4">User Reviews</h3>
+        <div class="space-y-6 max-h-[32rem] overflow-y-auto pr-2">
+          @foreach($movie->ratings->sortByDesc('created_at') as $rating)
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-yellow-400 font-semibold">⭐ {{ $rating->rating }}/5</span>
+                  <span class="text-gray-400 text-sm">by {{ $rating->user->name ?? 'User' }}</span>
                 </div>
+                <span class="text-gray-500 text-xs">{{ $rating->created_at->diffForHumans() }}</span>
+              </div>
+              @if($rating->comment)
+                <p class="text-gray-200">{{ $rating->comment }}</p>
+              @endif
             </div>
-
-            <!-- Long Description -->
-            <p class="text-white text-sm md:text-base leading-relaxed">
-                {{ $movie->long_description ?? 'No detailed description available.' }}
-            </p>
-
-            <!-- Average Rating -->
-            <div class="flex items-center gap-3 mt-2">
-                <span class="text-yellow-500 font-bold text-lg md:text-xl">
-                    ⭐ {{ $movie->ratings->count() ? round($movie->ratings->avg('rating'), 1) : 'N/A' }}/5
-                </span>
-                <span class="text-white text-sm md:text-base font-medium">Average Rating</span>
-            </div>
-
-            {{-- Admin Buttons --}}
-            @auth
-                @if(auth()->user()->role === 'admin')
-                    <div class="flex gap-3 mt-4">
-                        <a href="{{ route('movies.edit', $movie->id) }}" 
-                           class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
-                            Edit Movie
-                        </a>
-
-                        <form action="{{ route('movies.destroy', $movie->id) }}" method="POST"
-                              onsubmit="return confirm('Are you sure you want to delete this movie? This cannot be undone.');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" 
-                                    class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
-                                Delete Movie
-                            </button>
-                        </form>
-                    </div>
-                @endif
-            @endauth
-
+          @endforeach
         </div>
+      </div>
+
     </div>
 
-    <hr class="border-gray-200">
-
-    <!-- Rating & Reviews Section -->
-    <div class="md:flex md:gap-8">
-
-        <!-- Rating Form -->
-        <div class="flex-1 mb-6 md:mb-0">
-            <h3 class="text-white font-bold text-lg md:text-xl mb-4">Submit Your Review</h3>
-
-            @auth
-                @php
-                    $userHasRated = $movie->ratings->where('user_id', auth()->id())->isNotEmpty();
-                @endphp
-
-                @if(!$userHasRated)
-                    <form action="{{ route('ratings.store', $movie) }}" method="POST" class="space-y-4">
-                        @csrf
-
-                        <div>
-                            <label class="block text-white text-sm md:text-base font-medium mb-1">Rating</label>
-                            <select name="rating" required
-                                    class="w-24 border-gray-300 text-black border rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <option value="">Select</option>
-                                @for($i = 1; $i <= 5; $i++)
-                                    <option value="{{ $i }}" {{ old('rating') == $i ? 'selected' : '' }}>{{ $i }}</option>
-                                @endfor
-                            </select>
-                            @error('rating')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label class="block text-white text-sm md:text-base font-medium mb-1">Comment (optional)</label>
-                            <textarea name="comment" rows="3" maxlength="200"
-                                      class="w-full border-gray-300 border rounded-md p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                                      placeholder="Write your comment...">{{ old('comment') }}</textarea>
-                            @error('comment')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <button type="submit" 
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-all">
-                            Submit Rating
-                        </button>
-                    </form>
-                @else
-                    <p class="text-gray-300">You have already submitted a rating for this movie.</p>
-                @endif
-            @endauth
-
-            @guest
-                <p class="text-gray-300">Please <a href="{{ route('login') }}" class="underline">login</a> to submit a rating.</p>
-            @endguest
-        </div>
-
-        <!-- Reviews Section -->
-        <div class="flex-1">
-            <h3 class="text-white font-bold text-lg md:text-xl mb-4">Recent Reviews</h3>
-
-            <div id="ratings-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                @foreach($movie->ratings->sortByDesc('created_at')->take(5) as $rating)
-                    <div id="rating-{{ $rating->id }}" 
-                         class="border border-gray-200 rounded-lg p-3 bg-gray-50 flex justify-between items-start">
-
-                        <div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-yellow-500 font-semibold">⭐ {{ $rating->rating }}/5</span>
-                                <span class="text-gray-400 text-xs md:text-sm">{{ $rating->created_at->diffForHumans() }}</span>
-                            </div>
-
-                            @if($rating->comment)
-                                <p class="text-gray-700 mt-1">{{ $rating->comment }}</p>
-                            @endif
-                        </div>
-
-                        @auth
-                            @if(auth()->id() === $rating->user_id)
-                                <div class="flex flex-col gap-1 ml-3">
-                                    <a href="{{ route('ratings.edit', $rating->id) }}" 
-                                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-xs text-center">
-                                       Edit
-                                    </a>
-
-                                    <form action="{{ route('ratings.destroy', $rating) }}" method="POST"
-                                          onsubmit="return confirm('Are you sure you want to delete your review? This cannot be undone.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            @endif
-                        @endauth
-                    </div>
-                @endforeach
-            </div>
-
-            @auth
-                @if(auth()->user()->role === 'admin')
-                    <div class="mt-4">
-                        <a href="{{ route('admin.ratings.index', ['movie' => $movie->id]) }}"
-                           class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition">
-                           Manage Ratings
-                        </a>
-                    </div>
-                @endif
-            @endauth
-
-        </div>
-    </div>
-
-</div>
+  </div>
 </x-app-layout>

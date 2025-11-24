@@ -12,18 +12,16 @@ return new class extends Migration
         public function up(): void
     {
         Schema::table('movies', function (Blueprint $table) {
-            $table->string('short_description')->nullable()->after('title');
-            $table->text('long_description')->nullable()->after('short_description');
-            $table->dropColumn('description'); // To remove the old description column.
+            $table->string('trailer_url')->nullable()->after('long_description');
         });
     }
 
     public function down(): void
     {
         Schema::table('movies', function (Blueprint $table) {
-            $table->string('description')->nullable()->after('title');
-            $table->dropColumn(['short_description', 'long_description']);
+            $table->dropColumn('trailer_url');
         });
     }
+
 
 };

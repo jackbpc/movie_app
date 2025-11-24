@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class MovieController extends Controller
 {
-            public function index(Request $request)
+    public function index(Request $request)
     {
         $query = Movie::query()->with(['genres', 'ratings']);
 
@@ -17,7 +17,7 @@ class MovieController extends Controller
         if ($request->filled('genre')) {
             $query->whereHas('genres', function ($q) use ($request) {
                 $q->where('genres.id', $request->genre)
-                ->orWhere('genres.name', $request->genre);
+                    ->orWhere('genres.name', $request->genre);
             });
         }
 
@@ -36,13 +36,15 @@ class MovieController extends Controller
                 ->orderBy('ratings_avg_rating', 'desc');
         }
 
-        $movies = $query->get();
+        // Paginate with 9 movies per page
+        $movies = $query->paginate(9)->withQueryString();
 
         // For genre navigation
         $navGenres = Genre::orderBy('name')->pluck('name');
 
         return view('movies.index', compact('movies', 'navGenres'));
     }
+
 
     public function create()
     {
@@ -57,33 +59,33 @@ class MovieController extends Controller
     }
 
     public function store(Request $request)
-{
-    if (!$this->isAdmin()) {
+    {
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to create a movie.');
+        }
+
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'short_description' => 'required|string|max:255',
+            'long_description' => 'required|string|max:1000',
+            'genre' => 'required|array|exists:genres,id', // Should be array since we use multiselect
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Prepare data for the Movie model, mapping long_description to the database's 'description' column
+        $movieData = [
+            'title' => $data['title'],
+            'short_description' => $data['short_description'],
+            'long_description' => $data['long_description'],
+            'image' => $data['image'] ?? null,
+        ];
+
+        $movie = Movie::create($movieData);
+        $movie->genres()->attach($data['genre']); // Attach handles array of IDs
+
         return redirect()->route('movies.index')
-            ->with('error', 'You must be an admin to create a movie.');
-    }
-
-    $data = $request->validate([
-        'title' => 'required|string|max:255',
-        'short_description' => 'required|string|max:255',
-        'long_description' => 'required|string|max:1000',
-        'genre' => 'required|array|exists:genres,id', // Should be array since we use multiselect
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-
-    // Prepare data for the Movie model, mapping long_description to the database's 'description' column
-    $movieData = [
-        'title' => $data['title'],
-        'short_description' => $data['short_description'],
-        'long_description' => $data['long_description'],
-        'image' => $data['image'] ?? null,
-    ];
-
-    $movie = Movie::create($movieData);
-    $movie->genres()->attach($data['genre']); // Attach handles array of IDs
-
-    return redirect()->route('movies.index')
-        ->with('success', 'Movie created successfully!');
+            ->with('success', 'Movie created successfully!');
     }
 
     public function show(Movie $movie)
@@ -107,38 +109,38 @@ class MovieController extends Controller
     }
 
     public function update(Request $request, Movie $movie)
-{
-    if (!$this->isAdmin()) {
+    {
+        if (!$this->isAdmin()) {
+            return redirect()->route('movies.index')
+                ->with('error', 'You must be an admin to update this movie.');
+        }
+
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'short_description' => 'required|string|max:255',
+            'long_description' => 'required|string|max:1000',
+            'genre' => 'required|array',
+            //'rating' => 'required|numeric|min:0|max:5', Removed for consistency 
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $imageName;
+        }
+
+        $movieData = [
+            'title' => $data['title'],
+            'short_description' => $data['short_description'],
+            'description' => $data['long_description'], // Maps long_description to DB column 'description'
+            'image' => $data['image'] ?? $movie->image, // Retain existing image if new one isn't uploaded
+        ];
+
+        $movie->update($movieData); // Update using the correctly mapped array
+        $movie->genres()->sync($data['genre']);
+
         return redirect()->route('movies.index')
-            ->with('error', 'You must be an admin to update this movie.');
+            ->with('success', 'Movie updated successfully!');
     }
-
-    $data = $request->validate([
-        'title' => 'required|string|max:255',
-        'short_description' => 'required|string|max:255', 
-        'long_description' => 'required|string|max:1000', 
-        'genre' => 'required|array',
-        //'rating' => 'required|numeric|min:0|max:5', Removed for consistency 
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-
-    if ($request->hasFile('image')) {
-        $data['image'] = $imageName;
-    }
-
-    $movieData = [
-        'title' => $data['title'],
-        'short_description' => $data['short_description'],
-        'description' => $data['long_description'], // Maps long_description to DB column 'description'
-        'image' => $data['image'] ?? $movie->image, // Retain existing image if new one isn't uploaded
-    ];
-
-    $movie->update($movieData); // Update using the correctly mapped array
-    $movie->genres()->sync($data['genre']);
-
-    return redirect()->route('movies.index')
-        ->with('success', 'Movie updated successfully!');
-}
 
     public function destroy(Movie $movie)
     {
@@ -164,4 +166,3 @@ class MovieController extends Controller
         return $user && trim(strtolower($user->role)) === 'admin';
     }
 }
-

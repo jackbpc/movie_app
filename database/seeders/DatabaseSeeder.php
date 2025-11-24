@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             MovieGenreSeeder::class,
             UserSeeder::class,  
             RatingSeeder::class,
+            
         ]);
     }
 }
