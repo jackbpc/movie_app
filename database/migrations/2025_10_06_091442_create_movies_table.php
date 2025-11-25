@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('rating', 3, 1)->nullable();
             $table->string('image')->nullable();
             $table->timestamps();
+            
         });
     }
 

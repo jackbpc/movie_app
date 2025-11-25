@@ -16,11 +16,14 @@ class Movie extends Model
         'rating',
         'image',
         'trailer_url',
+        'release_year',
+        'age_rating',
+        'runtime',
     ];
 
-    /**
-     * Get the ratings for the movie.
-     */
+     
+    //  Get the ratings for the movie
+    
     public function ratings()
     {
         return $this->hasMany(\App\Models\Rating::class);
@@ -28,8 +31,11 @@ class Movie extends Model
 
     public function genres()
     {
-        return $this->belongsToMany(Genre::class);
+        return $this->belongsToMany(\App\Models\Genre::class);
     }
+
+
+     // Accessor for average rating
 
     public function getAverageRatingAttribute()
     {

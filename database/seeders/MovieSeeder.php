@@ -56,7 +56,5 @@ class MovieSeeder extends Seeder
                 'updated_at' => $currentTimestamp,
             ]));
         }
-
-        $this->command->info('All movies seeded successfully with release year, age rating, and runtime!');
     }
 }

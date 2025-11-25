@@ -46,10 +46,17 @@ class RatingController extends Controller
      * Show the form to edit a rating.
      */
     public function edit(Rating $rating)
-    {
-        $this->authorize('update', $rating);
+    { 
+        $user = auth()->user();
+
+        // Admins can edit any rating, users only their own
+        if ($user->role !== 'admin' && $rating->user_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return view('ratings.edit', compact('rating'));
     }
+
 
     /**
      * Update a rating and redirect back to the movie show page.
@@ -77,11 +84,18 @@ class RatingController extends Controller
      */
     public function destroy(Rating $rating)
     {
-        $this->authorize('delete', $rating);
+        $user = auth()->user();
+
+        // Admins can delete any rating, users can delete only their own
+        if ($user->role !== 'admin' && $rating->user_id !== $user->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $rating->delete();
 
-        return redirect()->back()->with('success', 'Rating deleted!');
+        return back()->with('success', 'Rating deleted successfully.');
     }
+
 
     /**
      * Display all ratings (admin only).

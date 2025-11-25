@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
 // ----------------------------
 Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
 
+// Auth-protected movie routes
 Route::middleware('auth')->group(function () {
     // Create movie
     Route::get('/movies/create', [MovieController::class, 'create'])->name('movies.create');
@@ -39,16 +40,18 @@ Route::middleware('auth')->group(function () {
     Route::put('/movies/{movie}', [MovieController::class, 'update'])->name('movies.update');
     Route::delete('/movies/{movie}', [MovieController::class, 'destroy'])->name('movies.destroy');
 
-    // Submit a rating for a movie
+    // Submit a new rating
     Route::post('/movies/{movie}/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
-    // Edit/delete user's own ratings
+    // Edit user's own rating
     Route::get('/ratings/{rating}/edit', [RatingController::class, 'edit'])->name('ratings.edit');
     Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+
+    // Delete user's own rating
     Route::delete('/ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
 });
 
-// Show movie route - must be **after** create/edit routes
+// Show movie route (must be **after** create/edit routes to avoid conflicts)
 Route::get('/movies/{movie}', [MovieController::class, 'show'])
     ->where('movie', '[0-9]+')
     ->name('movies.show');

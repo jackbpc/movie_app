@@ -43,6 +43,7 @@
                             required
                         >
                     </div>
+
                     {{-- Short Description --}}
                     <div>
                         <label class="block text-gray-900 font-medium mb-1">Short Description</label>
@@ -59,6 +60,42 @@
                             class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                             placeholder="The full detailed plot summary goes here..."
                             required>{{ old('long_description') }}</textarea>
+                    </div>
+
+                    {{-- Release Year --}}
+                    <div>
+                        <label class="block text-gray-900 font-medium mb-1">Release Year</label>
+                        <input type="number" name="release_year" value="{{ old('release_year') }}"
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="e.g. 2025"
+                        >
+                    </div>
+
+                    {{-- Age Rating --}}
+                    <div>
+                        <label class="block text-gray-900 font-medium mb-1">Age Rating</label>
+                        <input type="text" name="age_rating" value="{{ old('age_rating') }}"
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="e.g. PG-13"
+                        >
+                    </div>
+
+                    {{-- Runtime --}}
+                    <div>
+                        <label class="block text-gray-900 font-medium mb-1">Runtime</label>
+                        <input type="text" name="runtime" value="{{ old('runtime') }}"
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="e.g. 2h 30min"
+                        >
+                    </div>
+
+                    {{-- Trailer URL --}}
+                    <div>
+                        <label class="block text-gray-900 font-medium mb-1">Trailer URL</label>
+                        <input type="url" name="trailer_url" value="{{ old('trailer_url') }}"
+                            class="w-full border border-gray-300 rounded-md p-2 bg-white text-black placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                            placeholder="https://www.youtube.com/embed/VIDEO_ID"
+                        >
                     </div>
 
                     {{-- Genres --}}
@@ -81,9 +118,7 @@
                             preview: null,
                             loadFile(event) {
                                 const file = event.target.files[0];
-                                if(file) {
-                                    this.preview = URL.createObjectURL(file);
-                                }
+                                if(file) this.preview = URL.createObjectURL(file);
                             }
                         }" class="space-y-3">
                         <label class="block text-gray-900 font-medium mb-1">Movie Poster (optional)</label>
@@ -108,6 +143,7 @@
                             Create Movie
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>

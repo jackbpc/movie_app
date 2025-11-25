@@ -40,27 +40,58 @@
                     <div>
                         <label class="block text-white font-medium mb-1">Title</label>
                         <input type="text" name="title" value="{{ old('title', $movie->title) }}"
-                            class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
-                            required 
-                            placeholder="Title goes here...">
+                               class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                               required 
+                               placeholder="Title goes here...">
                     </div>
 
                     {{-- Short Description --}}
                     <div>
                         <label class="block text-white font-medium mb-1">Short Description (for index page)</label>
                         <textarea name="short_description" rows="4" required
-                            class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
-                            placeholder="A brief summary of the movie goes here...">{{ old('short_description', $movie->short_description ?? '') }}</textarea>
+                                  class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none" 
+                                  placeholder="A brief summary of the movie goes here...">{{ old('short_description', $movie->short_description ?? '') }}</textarea>
                     </div>
 
                     {{-- Long Description --}}
                     <div>
                         <label class="block text-white font-medium mb-1">Long Description (for show page)</label>
                         <textarea name="long_description" rows="4" required
-                            class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="The full detailed plot summary goes here...">{{ old('long_description', $movie->long_description ?? '') }}</textarea>
+                                  class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                  placeholder="The full detailed plot summary goes here...">{{ old('long_description', $movie->long_description ?? '') }}</textarea>
                     </div>
 
+                    {{-- Trailer URL --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Trailer URL</label>
+                        <input type="url" name="trailer_url" value="{{ old('trailer_url', $movie->trailer_url) }}"
+                               class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                               placeholder="https://www.youtube.com/embed/..." >
+                    </div>
+
+                    {{-- Release Year --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Release Year</label>
+                        <input type="number" name="release_year" value="{{ old('release_year', $movie->release_year) }}"
+                               class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                               placeholder="2000" min="1800" max="2100">
+                    </div>
+
+                    {{-- Age Rating --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Age Rating</label>
+                        <input type="text" name="age_rating" value="{{ old('age_rating', $movie->age_rating) }}"
+                               class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                               placeholder="PG-13">
+                    </div>
+
+                    {{-- Runtime --}}
+                    <div>
+                        <label class="block text-white font-medium mb-1">Runtime</label>
+                        <input type="text" name="runtime" value="{{ old('runtime', $movie->runtime) }}"
+                               class="w-full border-gray-300 border rounded-md p-2 text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                               placeholder="2h 30min">
+                    </div>
 
                     {{-- Genre Checkboxes --}}
                     <div>
@@ -77,7 +108,7 @@
                         </div>
                     </div>
 
-                    {{-- Movie Poster with Placeholder --}}
+                    {{-- Movie Poster --}}
                     <div x-data="{
                             preview: null,
                             loadFile(event) {
@@ -91,11 +122,10 @@
                         <label class="block text-white font-medium mb-1">Movie Poster (optional)</label>
 
                         <input type="file" name="image" @change="loadFile($event)"
-                            class="w-full border-gray-300 border rounded-md p-2 bg-white text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                               class="w-full border-gray-300 border rounded-md p-2 bg-white text-black focus:ring-2 focus:ring-indigo-500 focus:outline-none">
 
                         <div class="mt-3">
                             <p class="text-gray-300 text-sm mb-1">Preview:</p>
-
                             <img
                                 x-bind:src="preview ? preview : '{{ $movie->image ? asset('images/' . $movie->image) : asset('images/placeholder.jpg') }}'"
                                 alt="Movie Poster"
